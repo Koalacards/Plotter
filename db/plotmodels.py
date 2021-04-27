@@ -11,8 +11,8 @@ class BaseModel(Model):
 
 class DatasetEntries(BaseModel):
     data = TextField(null=True)
-    ds_type = TextField(null=True)
-    name = TextField(null=True)
+    ds_name = TextField(null=True)
+    plot_title = TextField(null=True)
     user_id = IntegerField(null=True)
 
     class Meta:
