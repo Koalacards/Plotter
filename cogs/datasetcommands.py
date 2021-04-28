@@ -12,8 +12,8 @@ class DataSetCommands(commands.Cog):
     @commands.command()
     async def createdataset(self, ctx, name:str):
         author = ctx.message.author
-        if dbfunc.get_num_datasets(author.id) >= 5:
-            await ctx.send("You have reached your maximum of 5 datasets. You can delete your existing datasets using `.removedataset <dataset_name>`")
+        if dbfunc.get_num_datasets(author.id) >= plotvars.max_datasets:
+            await ctx.send(f"You have reached your maximum of {plotvars.max_datasets} datasets. You can delete your existing datasets using `.removedataset <dataset_name>`")
             return
         try:
             dbfunc.set_dataset(author.id, name)

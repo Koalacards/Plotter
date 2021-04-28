@@ -48,3 +48,10 @@ def str2strlist(strlist_str: str):
         pass
 
     raise Exception("The format is bad")
+
+def verify_list_is_numlist(potential_numlist):
+    for num in potential_numlist:
+        if type(num) != float:
+            return None
+    
+    return True

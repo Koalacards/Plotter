@@ -7,6 +7,7 @@ client = commands.Bot(command_prefix=".")
 
 client.load_extension('cogs.datasetcommands')
 client.load_extension('cogs.plotfeaturecommands')
+client.load_extension('cogs.plotgenerationcommands')
 
 @client.event
 async def on_ready():
