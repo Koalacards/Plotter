@@ -1,4 +1,4 @@
-# PlotBot
+# Plotter
 Upcoming discord bot that will bring matplotlib functionalities to discord
 
 To create the bot yourself:
