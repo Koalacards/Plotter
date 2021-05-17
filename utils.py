@@ -1,4 +1,5 @@
 import json
+import discord
 
 def str2dict(dict_str: str):
     json_compatible = dict_str.replace("'", "\"")
@@ -55,3 +56,11 @@ def verify_list_is_numlist(potential_numlist):
             return None
     
     return True
+
+def create_embed(title:str, description:str, color):
+    embed = discord.Embed(
+        title=title,
+        description=description,
+        colour=color
+    )
+    return embed
