@@ -15,7 +15,8 @@ class DataSetCommands(commands.Cog):
     async def createdataset(self, ctx, name:str):
         author = ctx.author
         if dbfunc.get_num_datasets(author.id) >= plotvars.max_datasets:
-            await ctx.send(f"You have reached your maximum of {plotvars.max_datasets} datasets. You can delete your existing datasets using `/removedataset <dataset_name>`")
+            description=f"You have reached your maximum of {plotvars.max_datasets} datasets. You can delete your existing datasets using `/removedataset <dataset_name>`"
+            await ctx.send(embed=utils.error_embed(description))
             return
         try:
             dbfunc.set_dataset(author.id, name)
@@ -25,29 +26,33 @@ class DataSetCommands(commands.Cog):
             color=discord.Color.green()
             await ctx.send(embed=utils.create_embed(title, description, color))
         except:
-            await ctx.send("You already have a dataset with the same name!")
+            description="You already have a dataset with the same name!"
+            await ctx.send(embed=utils.error_embed(description))
+            return
 
     @cog_ext.cog_slash(name='removedataset', guild_ids=guild_ids)
     async def removedataset(self, ctx, name:str):
         author = ctx.author
         num_removed = dbfunc.remove_dataset(author.id, name)
         if num_removed == 0:
-            await ctx.send("There is no dataset with this name to remove!")
+            description="There is no dataset with this name to remove!"
+            await ctx.send(embed=utils.error_embed(description))
         else:
             title=f"Dataset `{name}` successfully removed!"
             description=""
             color=discord.Color.green()
             await ctx.send(embed=utils.create_embed(title, description, color))
     
-    @cog_ext.cog_slash(name='addnumrow', guild_ids=guild_ids)
-    async def addnumrow(self, ctx, dataset_name:str, row_name:str, values:str):
+    @cog_ext.cog_slash(name='addnumberrow', guild_ids=guild_ids)
+    async def addnumberrow(self, ctx, dataset_name:str, row_name:str, values:str):
         author = ctx.author
         datastr = None
         #Recieve data in string format from db
         try:
             datastr= dbfunc.get_dataset_data(author.id, dataset_name)
         except:
-            await ctx.send(f"You don't have a dataset with the name `{dataset_name}`!")
+            description=f"You don't have a dataset with the name `{dataset_name}`!"
+            await ctx.send(embed=utils.error_embed(description))
             return
 
         #turn string into list of numbers
@@ -55,8 +60,8 @@ class DataSetCommands(commands.Cog):
         try:
             numlist = utils.str2numlist(values)
         except Exception as e:
-            await ctx.send(f"{str(e)}")
-            await ctx.send("Either one of your values is not a number, or your list is not properly formatted. Please try again, or use `/help addnumrow` for assistance.")
+            description="Either one of your values is not a number, or your list is not properly formatted. Please try again, or use `/help addnumberrow` for assistance."
+            await ctx.send(embed=utils.error_embed(description))
             return
 
         #Turn data in string format to dict format (this should only fail if the bot did something wrong)
@@ -64,10 +69,11 @@ class DataSetCommands(commands.Cog):
         try:
             datadict=utils.str2dict(datastr)
         except:
-            await ctx.send(f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}")
+            description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+            await ctx.send(embed=utils.error_embed(description))
             return
 
-        #Add the values to the end of a pre-existing list or just use the x values
+        #Add the values to the end of a pre-existing list or just use the values
         previous_row_values = datadict.get(row_name, None)
         if previous_row_values is None:
             datadict[row_name] = numlist
@@ -82,7 +88,8 @@ class DataSetCommands(commands.Cog):
         try:
             dbfunc.set_dataset_data(author.id, dataset_name, dict2str)
         except:
-            await ctx.send(f"You don't have a dataset with the name `{dataset_name}` to add the data to!")
+            description=f"An error happened with the data upload on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+            await ctx.send(embed=utils.error_embed(description))
             return
         
         title=f"Number values have been added to the {row_name} row!"
@@ -99,15 +106,17 @@ class DataSetCommands(commands.Cog):
         try:
             datastr= dbfunc.get_dataset_data(author.id, dataset_name)
         except:
-            await ctx.send(f"You don't have a dataset with the name `{dataset_name}`!")
+            description=f"You don't have a dataset with the name `{dataset_name}`!"
+            await ctx.send(embed=utils.error_embed(description))
             return
 
         #turn string into list of numbers
-        numlist = None
+        strlist = None
         try:
-            numlist = utils.str2strlist(values)
+            strlist = utils.str2strlist(values)
         except:
-            await ctx.send("Your list is not properly formatted. Please try again, or use `/help addstringrow` for assistance.")
+            description="Your list is not properly formatted. Please try again, or use `/help addstringrow` for assistance."
+            await ctx.send(embed=utils.error_embed(description))
             return
 
         #Turn data in string format to dict format (this should only fail if the bot did something wrong)
@@ -115,10 +124,63 @@ class DataSetCommands(commands.Cog):
         try:
             datadict=utils.str2dict(datastr)
         except:
-            await ctx.send(f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}")
+            description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+            await ctx.send(embed=utils.error_embed(description))
             return
 
-        #Add the values to the end of a pre-existing list or just use the x values
+        #Add the values to the end of a pre-existing list or just use the values
+        previous_row_values = datadict.get(row_name, None)
+        if previous_row_values is None:
+            datadict[row_name] = strlist
+        else:
+            new_row_values = previous_row_values.copy()
+            for string in strlist:
+                new_row_values.append(string)
+            datadict[row_name] = new_row_values
+        
+        #add the new data to the database
+        dict2str = str(datadict)
+        try:
+            dbfunc.set_dataset_data(author.id, dataset_name, dict2str)
+        except:
+            description=f"An error happened with the data upload on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+            await ctx.send(embed=utils.error_embed(description))
+            return
+        
+        title=f"String values have been added to the {row_name} row!"
+        description=""
+        color=discord.Color.green()
+        await ctx.send(embed=utils.create_embed(title, description, color))
+
+    @cog_ext.cog_slash(name='addrandomnumrow', guild_ids=guild_ids)
+    async def addrandomnumberrow(self, ctx, dataset_name:str, row_name:str, amount_of_random_numbers:int, minimum_number:float, maximum_number:float):
+        author = ctx.author
+        datastr = None
+        #Recieve data in string format from db
+        try:
+            datastr= dbfunc.get_dataset_data(author.id, dataset_name)
+        except:
+            description=f"You don't have a dataset with the name `{dataset_name}`!"
+            await ctx.send(embed=utils.error_embed(description))
+            return
+        
+        #Turn data in string format to dict format (this should only fail if the bot did something wrong)
+        datadict = None
+        try:
+            datadict=utils.str2dict(datastr)
+        except:
+            description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+            await ctx.send(embed=utils.error_embed(description))
+            return
+        numlist = None
+        try:
+            numlist=utils.random_num_list(amount_of_random_numbers, minimum_number, maximum_number)
+        except:
+            description=f"An error occured while generating the random numbers. Make sure that your minimum and maximum values were entered as numbers and try again."
+            await ctx.send(embed=utils.error_embed(description))
+            return
+
+        #Add the values to the end of a pre-existing list or just use the values
         previous_row_values = datadict.get(row_name, None)
         if previous_row_values is None:
             datadict[row_name] = numlist
@@ -127,16 +189,17 @@ class DataSetCommands(commands.Cog):
             for num in numlist:
                 new_row_values.append(num)
             datadict[row_name] = new_row_values
-        
+
         #add the new data to the database
         dict2str = str(datadict)
         try:
             dbfunc.set_dataset_data(author.id, dataset_name, dict2str)
         except:
-            await ctx.send(f"You don't have a dataset with the name `{dataset_name}` to add the data to!")
+            description=f"An error happened with the data upload on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+            await ctx.send(embed=utils.error_embed(description))
             return
         
-        title=f"String values have been added to the {row_name} row!"
+        title=f"{amount_of_random_numbers} random number values of range {minimum_number} to {maximum_number} have been added to the `{row_name}` row! To view the values use `/viewdata {dataset_name}`"
         description=""
         color=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, color))
@@ -149,7 +212,8 @@ class DataSetCommands(commands.Cog):
         try:
             datastr= dbfunc.get_dataset_data(author.id, dataset_name)
         except:
-            await ctx.send(f"You don't have a dataset with the name `{dataset_name}`!")
+            description=f"You don't have a dataset with the name `{dataset_name}`!"
+            await ctx.send(embed=utils.error_embed(description))
             return
 
         #Turn data in string format to dict format (this should only fail if the bot did something wrong)
@@ -157,7 +221,8 @@ class DataSetCommands(commands.Cog):
         try:
             datadict=utils.str2dict(datastr)
         except:
-            await ctx.send(f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}")
+            description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+            await ctx.send(embed=utils.error_embed(description))
             return
 
         title=f"Data in the dataset {dataset_name}:"
@@ -184,7 +249,8 @@ class DataSetCommands(commands.Cog):
         try:
             datastr= dbfunc.get_dataset_data(author.id, dataset_name)
         except:
-            await ctx.send(f"You don't have a dataset with the name `{dataset_name}`!")
+            description=f"You don't have a dataset with the name `{dataset_name}`!"
+            await ctx.send(embed=utils.error_embed(description))
             return
 
         #Turn data in string format to dict format (this should only fail if the bot did something wrong)
@@ -192,12 +258,14 @@ class DataSetCommands(commands.Cog):
         try:
             datadict=utils.str2dict(datastr)
         except:
-            await ctx.send(f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}")
+            description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+            await ctx.send(embed=utils.error_embed(description))
             return
         
         values = datadict.get(row_name, None)
         if values is None:
-            await ctx.send(f"Your row name doesn't exist in dataset {dataset_name}. Please double-check the names using `/viewdata <dataset_name>` and try again.")
+            description=f"Your row name doesn't exist in dataset {dataset_name}. Please double-check the names using `/viewdata <dataset_name>` and try again."
+            await ctx.send(embed=utils.error_embed(description))
             return
 
         del datadict[row_name]
