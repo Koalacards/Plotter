@@ -1,6 +1,5 @@
-import discord
 from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
+from discord_slash import cog_ext
 import utils
 from plotvars import guild_ids
 from cogs.helpvars import *

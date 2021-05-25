@@ -2,6 +2,7 @@ import json
 from typing import Dict, List
 import discord
 import random
+import db.plotdbfunctions as dbfunc
 
 def str2dict(dict_str: str) -> Dict:
     json_compatible = dict_str.replace("'", "\"")
@@ -80,3 +81,12 @@ def random_num_list(amount:int, min:float, max:float) -> List[float]:
     for _ in range(amount):
         random_list.append(round(random.uniform(min, max), 3))
     return random_list
+
+#Check if the axis info is boundaries or one of the options, and return either a list or string depending
+def sanitize_axis_info(author, dataset_name:str):
+    axis_str = dbfunc.get_axis_info(author.id, dataset_name)
+    axis_load = json.loads(axis_str)
+    if type(axis_load) == list:
+        return axis_load
+    else:
+        return str(axis_load)

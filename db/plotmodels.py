@@ -10,6 +10,7 @@ class BaseModel(Model):
         database = database
 
 class DatasetEntries(BaseModel):
+    axis_info = TextField(null=True)
     data = TextField(null=True)
     ds_name = TextField(null=True)
     plot_title = TextField(null=True)

@@ -1,10 +1,11 @@
 import discord
 from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
+from discord_slash import cog_ext
 import db.plotdbfunctions as dbfunc
 import utils
 import plotvars
 from plotvars import guild_ids
+import asyncutils
 
 class DataSetCommands(commands.Cog):
     @cog_ext.cog_slash(name='ping', guild_ids=guild_ids)
@@ -45,31 +46,18 @@ class DataSetCommands(commands.Cog):
     
     @cog_ext.cog_slash(name='addnumberrow', guild_ids=guild_ids)
     async def addnumberrow(self, ctx, dataset_name:str, row_name:str, values:str):
-        author = ctx.author
-        datastr = None
-        #Recieve data in string format from db
-        try:
-            datastr= dbfunc.get_dataset_data(author.id, dataset_name)
-        except:
-            description=f"You don't have a dataset with the name `{dataset_name}`!"
-            await ctx.send(embed=utils.error_embed(description))
+
+        #Get the data
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
+        if datadict is None:
             return
 
-        #turn string into list of numbers
+        #turn values string into list of numbers
         numlist = None
         try:
             numlist = utils.str2numlist(values)
         except Exception as e:
             description="Either one of your values is not a number, or your list is not properly formatted. Please try again, or use `/help addnumberrow` for assistance."
-            await ctx.send(embed=utils.error_embed(description))
-            return
-
-        #Turn data in string format to dict format (this should only fail if the bot did something wrong)
-        datadict = None
-        try:
-            datadict=utils.str2dict(datastr)
-        except:
-            description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
             await ctx.send(embed=utils.error_embed(description))
             return
 
@@ -83,13 +71,9 @@ class DataSetCommands(commands.Cog):
                 new_row_values.append(num)
             datadict[row_name] = new_row_values
         
-        #add the new data to the database
-        dict2str = str(datadict)
-        try:
-            dbfunc.set_dataset_data(author.id, dataset_name, dict2str)
-        except:
-            description=f"An error happened with the data upload on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
-            await ctx.send(embed=utils.error_embed(description))
+        #Write the data to the database
+        data_written = await asyncutils.log_data_to_database(ctx, dataset_name, datadict)
+        if data_written == False:
             return
         
         title=f"Number values have been added to the {row_name} row!"
@@ -100,31 +84,18 @@ class DataSetCommands(commands.Cog):
 
     @cog_ext.cog_slash(name='addstringrow', guild_ids=guild_ids)
     async def addstringrow(self, ctx, dataset_name:str, row_name:str, values:str):
-        author = ctx.author
-        datastr = None
-        #Recieve data in string format from db
-        try:
-            datastr= dbfunc.get_dataset_data(author.id, dataset_name)
-        except:
-            description=f"You don't have a dataset with the name `{dataset_name}`!"
-            await ctx.send(embed=utils.error_embed(description))
+
+        #Get the data
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
+        if datadict is None:
             return
 
-        #turn string into list of numbers
+        #turn values string into list of strings
         strlist = None
         try:
             strlist = utils.str2strlist(values)
         except:
             description="Your list is not properly formatted. Please try again, or use `/help addstringrow` for assistance."
-            await ctx.send(embed=utils.error_embed(description))
-            return
-
-        #Turn data in string format to dict format (this should only fail if the bot did something wrong)
-        datadict = None
-        try:
-            datadict=utils.str2dict(datastr)
-        except:
-            description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
             await ctx.send(embed=utils.error_embed(description))
             return
 
@@ -138,13 +109,9 @@ class DataSetCommands(commands.Cog):
                 new_row_values.append(string)
             datadict[row_name] = new_row_values
         
-        #add the new data to the database
-        dict2str = str(datadict)
-        try:
-            dbfunc.set_dataset_data(author.id, dataset_name, dict2str)
-        except:
-            description=f"An error happened with the data upload on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
-            await ctx.send(embed=utils.error_embed(description))
+        #Write the data to the database
+        data_written = await asyncutils.log_data_to_database(ctx, dataset_name, datadict)
+        if data_written == False:
             return
         
         title=f"String values have been added to the {row_name} row!"
@@ -154,24 +121,12 @@ class DataSetCommands(commands.Cog):
 
     @cog_ext.cog_slash(name='addrandomnumrow', guild_ids=guild_ids)
     async def addrandomnumberrow(self, ctx, dataset_name:str, row_name:str, amount_of_random_numbers:int, minimum_number:float, maximum_number:float):
-        author = ctx.author
-        datastr = None
-        #Recieve data in string format from db
-        try:
-            datastr= dbfunc.get_dataset_data(author.id, dataset_name)
-        except:
-            description=f"You don't have a dataset with the name `{dataset_name}`!"
-            await ctx.send(embed=utils.error_embed(description))
+        #Get the data
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
+        if datadict is None:
             return
-        
-        #Turn data in string format to dict format (this should only fail if the bot did something wrong)
-        datadict = None
-        try:
-            datadict=utils.str2dict(datastr)
-        except:
-            description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
-            await ctx.send(embed=utils.error_embed(description))
-            return
+
+        #Get the random list of numbers
         numlist = None
         try:
             numlist=utils.random_num_list(amount_of_random_numbers, minimum_number, maximum_number)
@@ -179,6 +134,7 @@ class DataSetCommands(commands.Cog):
             description=f"An error occured while generating the random numbers. Make sure that your minimum and maximum values were entered as numbers and try again."
             await ctx.send(embed=utils.error_embed(description))
             return
+
 
         #Add the values to the end of a pre-existing list or just use the values
         previous_row_values = datadict.get(row_name, None)
@@ -190,13 +146,9 @@ class DataSetCommands(commands.Cog):
                 new_row_values.append(num)
             datadict[row_name] = new_row_values
 
-        #add the new data to the database
-        dict2str = str(datadict)
-        try:
-            dbfunc.set_dataset_data(author.id, dataset_name, dict2str)
-        except:
-            description=f"An error happened with the data upload on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
-            await ctx.send(embed=utils.error_embed(description))
+        #Write the data to the database
+        data_written = await asyncutils.log_data_to_database(ctx, dataset_name, datadict)
+        if data_written == False:
             return
         
         title=f"{amount_of_random_numbers} random number values of range {minimum_number} to {maximum_number} have been added to the `{row_name}` row! To view the values use `/viewdata {dataset_name}`"
@@ -207,22 +159,9 @@ class DataSetCommands(commands.Cog):
     @cog_ext.cog_slash(name='viewdata', guild_ids=guild_ids)
     async def viewdata(self, ctx, dataset_name:str):
         author = ctx.author
-        datastr = None
-        #Recieve data in string format from db
-        try:
-            datastr= dbfunc.get_dataset_data(author.id, dataset_name)
-        except:
-            description=f"You don't have a dataset with the name `{dataset_name}`!"
-            await ctx.send(embed=utils.error_embed(description))
-            return
-
-        #Turn data in string format to dict format (this should only fail if the bot did something wrong)
-        datadict = None
-        try:
-            datadict=utils.str2dict(datastr)
-        except:
-            description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
-            await ctx.send(embed=utils.error_embed(description))
+        #Get the data
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name)
+        if datadict is None:
             return
 
         title=f"Data in the dataset {dataset_name}:"
@@ -230,6 +169,8 @@ class DataSetCommands(commands.Cog):
         color=discord.Color.orange()
         for key, value in datadict.items():
             description+=f"{key}: {value} \n"
+        description+=f"Plot Title: {dbfunc.get_plot_title(author.id, dataset_name)}\n"
+        description+=f"Axis info: {dbfunc.get_axis_info(author.id,dataset_name)}\n"
 
         await ctx.send(embed=utils.create_embed(title=title, description=description, color=color))
 
@@ -243,23 +184,9 @@ class DataSetCommands(commands.Cog):
 
     @cog_ext.cog_slash(name='removerow', guild_ids=guild_ids)
     async def removerow(self, ctx, dataset_name:str, row_name:str):
-        author = ctx.author
-        datastr = None
-        #Recieve data in string format from db
-        try:
-            datastr= dbfunc.get_dataset_data(author.id, dataset_name)
-        except:
-            description=f"You don't have a dataset with the name `{dataset_name}`!"
-            await ctx.send(embed=utils.error_embed(description))
-            return
-
-        #Turn data in string format to dict format (this should only fail if the bot did something wrong)
-        datadict = None
-        try:
-            datadict=utils.str2dict(datastr)
-        except:
-            description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
-            await ctx.send(embed=utils.error_embed(description))
+        #Get the data
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name)
+        if datadict is None:
             return
         
         values = datadict.get(row_name, None)
@@ -270,7 +197,10 @@ class DataSetCommands(commands.Cog):
 
         del datadict[row_name]
 
-        dbfunc.set_dataset_data(author.id, dataset_name, str(datadict))
+        #Write the data to the database
+        data_written = await asyncutils.log_data_to_database(ctx, dataset_name, datadict)
+        if data_written == False:
+            return
         
         title=f"Row {row_name} has been deleted from dataset {dataset_name}!"
         description=""
