@@ -3,55 +3,47 @@ from typing import Dict, List
 import discord
 import random
 import db.plotdbfunctions as dbfunc
+from matplotlib import colors
 
 def str2dict(dict_str: str) -> Dict:
     json_compatible = dict_str.replace("'", "\"")
     new_dict = json.loads(json_compatible)
     return new_dict
 
-def str2numlist(numlist_str: str) -> List[float]:
+def str2numlist(numlist_str: str, separator:str) -> List[float]:
     try:
-        num_list = [ float(x) for x in numlist_str.split() ]
+        num_list = [ float(x) for x in numlist_str.split(separator) ]
         return num_list
     except Exception as e:
-        pass
+        raise Exception("Either the format is bad or one of the values is not a number")
+
+
+def str2strlist(strlist_str: str, separator:str) -> List[str]:
     try:
-        num_list = [ float(x) for x in numlist_str.split(", ") ]
-        return num_list
-    except Exception as e:
-        pass
-
-    try:
-        num_list = [ float(x) for x in numlist_str.split(",") ]
-        return num_list
-    except Exception as e:
-        pass
-
-    raise Exception("Either the format is bad or one of the values is not a number")
-
-
-def str2strlist(strlist_str: str) -> List[str]:
-    try:
-        str_list = [ str(x) for x in strlist_str.split() ]
+        str_list = [ str(x) for x in strlist_str.split(separator) ]
         return str_list
     except Exception as e:
-        print(e)
-        pass
-    try:
-        str_list = [ str(x) for x in strlist_str.split(", ") ]
-        return str_list
-    except Exception as e:
-        print(e)
-        pass
+        raise Exception("The format is bad")\
 
+def str2colorlist(colorlist_str:str, separator:str) -> List[str]:
+    colorlist = str2strlist(colorlist_str, separator)
     try:
-        str_list = [ str(x) for x in strlist_str.split(",") ]
-        return str_list
-    except Exception as e:
-        print(e)
-        pass
+        verify_list_is_colorlist(colorlist)
+        return colorlist
+    except:
+        raise Exception("One of the colors in the list is not a hex color.")
 
-    raise Exception("The format is bad")
+
+def verify_string_is_color(colorstr:str):
+    try:
+        colors.hex2color(colorstr)
+    except:
+        raise Exception("Color is not a hex color!")
+
+def generate_random_color():
+    color = "#" + "%06x" % random.randint(0, 0xFFFFFF)
+    return color
+
 
 def verify_list_is_numlist(potential_numlist):
     for num in potential_numlist:
@@ -59,6 +51,13 @@ def verify_list_is_numlist(potential_numlist):
             return None
     
     return True
+
+def verify_list_is_colorlist(potential_colorlist):
+    for color in potential_colorlist:
+        try:
+            verify_string_is_color(color)
+        except:
+            raise Exception("One of the colors in the list is not a hex color.")
 
 def create_embed(title:str, description:str, color) -> discord.Embed:
     embed = discord.Embed(

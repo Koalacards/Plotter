@@ -44,13 +44,14 @@ async def log_data_to_database(ctx, dataset_name:str, datadict) -> bool:
     
     return True
 
-async def verify_rows_exist_in_dataset(ctx, dataset_name:str, datadict, rows):
+async def verify_rows_exist_in_dataset(ctx, dataset_name:str, datadict, rows, send_error_message=True):
     row_values = []
     for row in rows:
         values = datadict.get(row, None)
         if values is None:
-            description = f"Row {row} does not exist in dataset {dataset_name}!"
-            await ctx.send(embed=utils.error_embed(description))
+            if send_error_message:
+                description = f"Row {row} does not exist in dataset {dataset_name}!"
+                await ctx.send(embed=utils.error_embed(description))
             return None
         else:
             row_values.append(values)

@@ -16,7 +16,7 @@ class DataSetCommands(commands.Cog):
     async def createdataset(self, ctx, name:str):
         author = ctx.author
         if dbfunc.get_num_datasets(author.id) >= plotvars.max_datasets:
-            description=f"You have reached your maximum of {plotvars.max_datasets} datasets. You can delete your existing datasets using `/removedataset <dataset_name>`"
+            description=f"You have reached your maximum of `{plotvars.max_datasets}` datasets. You can delete your existing datasets using `/removedataset <dataset_name>`"
             await ctx.send(embed=utils.error_embed(description))
             return
         try:
@@ -45,23 +45,23 @@ class DataSetCommands(commands.Cog):
             await ctx.send(embed=utils.create_embed(title, description, color))
     
     @cog_ext.cog_slash(name='addnumberrow', guild_ids=guild_ids)
-    async def addnumberrow(self, ctx, dataset_name:str, row_name:str, values:str):
+    async def addnumberrow(self, ctx, dataset_name:str, row_name:str, numbers:str, separator:str=" "):
 
         #Get the data
         datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
         if datadict is None:
             return
 
-        #turn values string into list of numbers
+        #turn numbers string into list of numbers
         numlist = None
         try:
-            numlist = utils.str2numlist(values)
+            numlist = utils.str2numlist(numbers, separator)
         except Exception as e:
             description="Either one of your values is not a number, or your list is not properly formatted. Please try again, or use `/help addnumberrow` for assistance."
             await ctx.send(embed=utils.error_embed(description))
             return
 
-        #Add the values to the end of a pre-existing list or just use the values
+        #Add the numbers to the end of a pre-existing list or just use the values
         previous_row_values = datadict.get(row_name, None)
         if previous_row_values is None:
             datadict[row_name] = numlist
@@ -76,30 +76,30 @@ class DataSetCommands(commands.Cog):
         if data_written == False:
             return
         
-        title=f"Number values have been added to the {row_name} row!"
+        title=f"Number values have been added to the `{row_name}` row!"
         description=""
         color=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, color))
 
 
     @cog_ext.cog_slash(name='addstringrow', guild_ids=guild_ids)
-    async def addstringrow(self, ctx, dataset_name:str, row_name:str, values:str):
+    async def addstringrow(self, ctx, dataset_name:str, row_name:str, strings:str, separator:str=" "):
 
         #Get the data
         datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
         if datadict is None:
             return
 
-        #turn values string into list of strings
+        #turn strings into list of strings
         strlist = None
         try:
-            strlist = utils.str2strlist(values)
+            strlist = utils.str2strlist(strings, separator)
         except:
             description="Your list is not properly formatted. Please try again, or use `/help addstringrow` for assistance."
             await ctx.send(embed=utils.error_embed(description))
             return
 
-        #Add the values to the end of a pre-existing list or just use the values
+        #Add the strings to the end of a pre-existing list or just use the values
         previous_row_values = datadict.get(row_name, None)
         if previous_row_values is None:
             datadict[row_name] = strlist
@@ -114,7 +114,7 @@ class DataSetCommands(commands.Cog):
         if data_written == False:
             return
         
-        title=f"String values have been added to the {row_name} row!"
+        title=f"String values have been added to the `{row_name}` row!"
         description=""
         color=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, color))
@@ -151,7 +151,7 @@ class DataSetCommands(commands.Cog):
         if data_written == False:
             return
         
-        title=f"{amount_of_random_numbers} random number values of range {minimum_number} to {maximum_number} have been added to the `{row_name}` row! To view the values use `/viewdata {dataset_name}`"
+        title=f"`{amount_of_random_numbers}` random number values of range `{minimum_number}` to `{maximum_number}` have been added to the `{row_name}` row! To view the values use `/viewdata `{dataset_name}`"
         description=""
         color=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, color))
@@ -164,7 +164,7 @@ class DataSetCommands(commands.Cog):
         if datadict is None:
             return
 
-        title=f"Data in the dataset {dataset_name}:"
+        title=f"Data in the dataset `{dataset_name}`:"
         description = ""
         color=discord.Color.orange()
         for key, value in datadict.items():
@@ -191,7 +191,7 @@ class DataSetCommands(commands.Cog):
         
         values = datadict.get(row_name, None)
         if values is None:
-            description=f"Your row name doesn't exist in dataset {dataset_name}. Please double-check the names using `/viewdata <dataset_name>` and try again."
+            description=f"Your row name doesn't exist in dataset `{dataset_name}`. Please double-check the names using `/viewdata <dataset_name>` and try again."
             await ctx.send(embed=utils.error_embed(description))
             return
 
@@ -202,11 +202,86 @@ class DataSetCommands(commands.Cog):
         if data_written == False:
             return
         
-        title=f"Row {row_name} has been deleted from dataset {dataset_name}!"
+        title=f"Row `{row_name}` has been deleted from dataset `{dataset_name}`!"
         description=""
         color=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, color))
 
+    
+    @cog_ext.cog_slash(name='addcolorrow', guild_ids=guild_ids)
+    async def addcolorrow(self, ctx, dataset_name:str, row_name:str, colors:str, separator:str=" "):
+        #Get the data
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
+        if datadict is None:
+            return
+
+        #turn colors string into list of colors
+        colorlist = None
+        try:
+            colorlist = utils.str2colorlist(colors, separator)
+        except:
+            description="Either one of your values is not a color, or your list is not properly formatted. Please try again or use `/help addcolorrow` for assistance."
+            await ctx.send(embed=utils.error_embed(description))
+            return
+        
+        #Add the colors to the end of a pre-existing list or just use the values
+        previous_row_values = datadict.get(row_name, None)
+        if previous_row_values is None:
+            datadict[row_name] = colorlist
+        else:
+            new_row_values = previous_row_values.copy()
+            for color in colorlist:
+                new_row_values.append(color)
+            datadict[row_name] = new_row_values
+
+        #Write the data to the database
+        data_written = await asyncutils.log_data_to_database(ctx, dataset_name, datadict)
+        if data_written == False:
+            return
+
+        title=f"Color values have been added to the `{row_name}` row!"
+        description=""
+        color=discord.Color.green()
+        await ctx.send(embed=utils.create_embed(title, description, color))
+
+
+    @cog_ext.cog_slash(name='addrandomcolorrow', guild_ids=guild_ids)
+    async def addrandomcolorrow(self, ctx, dataset_name:str, row_name:str, amount_of_random_colors:int):
+        #Get the data
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
+        if datadict is None:
+            return
+    
+        #Create random list of colors
+        colorlist=[]
+        try:
+            for _ in range(amount_of_random_colors):
+                colorlist.append(utils.generate_random_color())
+        except:
+            description=f"An error with color generation occurred on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+            await ctx.send(embed=utils.error_embed(description))
+            return
+        
+        #Add the colors to the end of a pre-existing list or just use the values
+        previous_row_values = datadict.get(row_name, None)
+        if previous_row_values is None:
+            datadict[row_name] = colorlist
+        else:
+            new_row_values = previous_row_values.copy()
+            for color in colorlist:
+                new_row_values.append(color)
+            datadict[row_name] = new_row_values
+
+        #Write the data to the database
+        data_written = await asyncutils.log_data_to_database(ctx, dataset_name, datadict)
+        if data_written == False:
+            return
+
+
+        title=f"`{amount_of_random_colors}` color values have been added to the `{row_name}` row!"
+        description=""
+        color=discord.Color.green()
+        await ctx.send(embed=utils.create_embed(title, description, color))
 
 def setup(bot):
     bot.add_cog(DataSetCommands(bot))
