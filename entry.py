@@ -16,6 +16,7 @@ client.load_extension('cogs.datasetcommands')
 client.load_extension('cogs.plotfeaturecommands')
 client.load_extension('cogs.plotgenerationcommands')
 client.load_extension('cogs.helpcommand')
+client.load_extension('cogs.savedplotgeneration')
 
 @client.event
 async def on_ready():

@@ -13,6 +13,7 @@ class DatasetEntries(BaseModel):
     axis_info = TextField(null=True)
     data = TextField(null=True)
     ds_name = TextField(null=True)
+    graph_data = TextField(null=True)
     plot_title = TextField(null=True)
     user_id = IntegerField(null=True)
 

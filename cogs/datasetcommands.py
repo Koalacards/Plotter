@@ -6,6 +6,7 @@ import utils
 import plotvars
 from plotvars import guild_ids
 import asyncutils
+import os
 
 class DataSetCommands(commands.Cog):
     @cog_ext.cog_slash(name='ping', guild_ids=guild_ids)
@@ -172,7 +173,75 @@ class DataSetCommands(commands.Cog):
         description+=f"Plot Title: {dbfunc.get_plot_title(author.id, dataset_name)}\n"
         description+=f"Axis info: {dbfunc.get_axis_info(author.id,dataset_name)}\n"
 
-        await ctx.send(embed=utils.create_embed(title=title, description=description, color=color))
+        try:   
+            await ctx.send(embed=utils.create_embed(title=title, description=description, color=color))
+        except:
+            msg = f"Your data was unable to be sent, most likely due to discord's message character limit. Use `/viewdataintxt` to get the data with no character limit."
+            await ctx.send(embed=utils.error_embed(msg))
+
+    @cog_ext.cog_slash(name='viewdataintxt', guild_ids=guild_ids)
+    async def viewdataintxt(self, ctx, dataset_name:str):
+        author = ctx.author
+        #Get the data
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name)
+        if datadict is None:
+            return
+        strtowrite=f"Data in the dataset `{dataset_name}`:\n"
+        for key, value in datadict.items():
+            strtowrite+=f"{key}: {value} \n"
+        strtowrite+=f"Plot Title: {dbfunc.get_plot_title(author.id, dataset_name)}\n"
+        strtowrite+=f"Axis info: {dbfunc.get_axis_info(author.id,dataset_name)}\n"
+
+        txtfile = f"{author.name}_{dataset_name}.txt"
+
+        file = open(txtfile, "w+")
+        file.write(strtowrite)
+        file.close()
+
+        await ctx.send(file=discord.File(txtfile))
+
+        os.remove(txtfile)
+
+    @cog_ext.cog_slash(name='viewgraphdata', guild_ids=guild_ids)
+    async def viewgraphdata(self, ctx, dataset_name:str):
+        #Get the graph data
+        graph_data_dict = await asyncutils.get_graph_data_dictionary(ctx, dataset_name)
+        if graph_data_dict is None:
+            return
+        
+        title=f"Saved graph data in the dataset `{dataset_name}`:"
+        description = ""
+        color=discord.Color.orange()
+        for key, value in graph_data_dict.items():
+            description+=f"{key}: {value} \n"
+        
+        try:   
+            await ctx.send(embed=utils.create_embed(title=title, description=description, color=color))
+        except:
+            msg = f"Your data was unable to be sent, most likely due to discord's message character limit. Use `/viewdataintxt` to get the data with no character limit."
+            await ctx.send(embed=utils.error_embed(msg))
+
+    @cog_ext.cog_slash(name='viewgraphdataintxt', guild_ids=guild_ids)
+    async def viewgraphdataintxt(self, ctx, dataset_name:str):
+        author = ctx.author
+        #Get the data
+        graph_data_dict = await asyncutils.get_graph_data_dictionary(ctx, dataset_name)
+        if graph_data_dict is None:
+            return
+
+        strtowrite=f"Saved graph data in the dataset `{dataset_name}`:\n"
+        for key, value in graph_data_dict.items():
+            strtowrite+=f"{key}: {value} \n"
+
+        txtfile = f"{author.name}_{dataset_name}_graph.txt"
+
+        file = open(txtfile, "w+")
+        file.write(strtowrite)
+        file.close()
+
+        await ctx.send(file=discord.File(txtfile))
+
+        os.remove(txtfile)
 
     @cog_ext.cog_slash(name='viewdatasets', guild_ids=guild_ids)
     async def viewdatasets(self, ctx):

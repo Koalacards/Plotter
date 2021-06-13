@@ -13,7 +13,10 @@ import asyncutils
 class PlotGenerationCommands(commands.Cog):
     
     @cog_ext.cog_slash(name='scatterplot', guild_ids=guild_ids, description="Create a scatterplot")
-    async def scatterplot(self, ctx, dataset_name, x_row:str, y_row:str, x_label:str="", y_label:str="", size_row:str="", color_row_or_one_color:str="", transparency:float=1):
+    async def scatterplot(self, ctx, dataset_name, x_row:str, y_row:str, x_label:str="", y_label:str="", size_row:str="", color_row_or_one_color:str="", transparency:float=1, saveas:str=""):
+        await self._scatterplot(ctx, dataset_name, x_row, y_row, x_label, y_label, size_row, color_row_or_one_color, transparency, saveas)
+
+    async def _scatterplot(self, ctx, dataset_name, x_row:str, y_row:str, x_label:str="", y_label:str="", size_row:str="", color_row_or_one_color:str="", transparency:float=1, saveas:str=""):
         author = ctx.author
 
         #Get the data
@@ -78,12 +81,14 @@ class PlotGenerationCommands(commands.Cog):
             return
         
         
-        #Make the graph
+        #Turn all of the values into numpy arrays (if applicable)
         x_npy = numpy.array(x_values)
         y_npy = numpy.array(y_values)
         size_npy = numpy.array(size_values) if size_values != "" else None
         colors_npy = numpy.array(color_values) if color_is_row else color_values
         colors_npy = None if color_row_or_one_color == "" else colors_npy
+
+        #Create the matplotlib graph
         plt.scatter(x_npy, y_npy, s=size_npy, c=colors_npy, alpha=transparency)
         potential_title=dbfunc.get_plot_title(author.id, dataset_name)
         plt.title(potential_title)
@@ -98,11 +103,42 @@ class PlotGenerationCommands(commands.Cog):
         plt.close()
         
         file=discord.File(file_name)
-        plot_embed = utils.create_embed(f"Scatterplot for {author.name}", "", discord.Color.dark_orange())
+        description=f"Plot has been saved as {saveas}! Use `/viewgraphdata {dataset_name}` to view the graph data and `/plotgenerate {saveas}` to generate the plot again." if saveas != "" else ""
+        plot_embed = utils.create_embed(f"Scatterplot for {author.name}", description, discord.Color.dark_orange())
         plot_embed.set_image(url=f"attachment://{file_name}")
         await ctx.send(embed=plot_embed, file=file)
         os.remove(file_name)
+
+
+        if saveas != "":
+            graph_data = {
+                "name": "scatterplot",
+                "x_row": x_row,
+                "y_row": y_row,
+                "x_label": x_label,
+                "y_label": y_label,
+                "size_row": size_row,
+                "color_row_or_one_color": color_row_or_one_color,
+                "transparency": transparency
+            }
+
+            await self._save_graph_data(ctx, dataset_name, graph_data)
+
+
+    
+    async def _save_graph_data(ctx, dataset_name:str, saveas:str,  graph_data):
+        #Get the pre-existing graph data
+        graph_data_dict = await asyncutils.get_graph_data_dictionary(ctx, dataset_name)
+        if graph_data_dict is None:
+            return
         
+        #Set the dictionary value for the saveas to be the graph data
+        graph_data_dict[saveas] = graph_data
+
+        #Write the graph data to the database
+        graph_data_written = await asyncutils.log_graph_data_to_database(ctx, dataset_name, graph_data_dict)
+        if graph_data_written == False:
+            return
         
 
 def setup(bot):

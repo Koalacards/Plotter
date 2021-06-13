@@ -4,7 +4,7 @@ from db.plotmodels import *
 def set_dataset(user_id:int, ds_name:str):
     query = DatasetEntries.select().where(DatasetEntries.user_id == user_id and DatasetEntries.ds_name == ds_name)
     if len(query) == 0:
-        DatasetEntries.create(user_id=user_id, ds_name=ds_name, data="{}", plot_title=ds_name, axis_info="on")
+        DatasetEntries.create(user_id=user_id, ds_name=ds_name, data="{}", plot_title=ds_name, axis_info="on", graph_data={})
     else:
         raise Exception("Dataset already exists with user id and ds_name")
 
@@ -26,6 +26,18 @@ def get_dataset_data(user_id:int, ds_name:str):
 
 def set_dataset_data(user_id:int, ds_name:str, data:str):
     query = DatasetEntries.update(data=data).where(DatasetEntries.user_id == user_id and DatasetEntries.ds_name == ds_name)
+    return query.execute()
+
+def get_dataset_graph_data(user_id:int, ds_name:str):
+    query = DatasetEntries.select().where(DatasetEntries.user_id == user_id and DatasetEntries.ds_name == ds_name)
+    if len(query) == 0:
+        raise Exception("No dataset exists with given ds_name")  
+    else:
+        for item in query:
+            return item.graph_data  
+
+def set_dataset_graph_data(user_id:int, ds_name:str, graph_data:str):
+    query = DatasetEntries.update(graph_data=graph_data).where(DatasetEntries.user_id == user_id and DatasetEntries.ds_name == ds_name)
     return query.execute()
 
 def get_names_of_datasets(user_id:int):
