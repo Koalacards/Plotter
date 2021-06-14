@@ -2,7 +2,7 @@ import utils
 import db.plotdbfunctions as dbfunc
 import plotvars
 
-async def get_data_dictionary(ctx, dataset_name:str, check_length:bool=False):
+async def get_data_dictionary(ctx, dataset_name:str):
     author = ctx.author
     datastr = None
     #Recieve data in string format from db
@@ -21,13 +21,6 @@ async def get_data_dictionary(ctx, dataset_name:str, check_length:bool=False):
         description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
         await ctx.send(embed=utils.error_embed(description))
         return None
-
-    if check_length == True:
-        #Check to see if the dataset has it's maximum number of rows
-        if len(datadict.keys()) >= plotvars.max_rows:
-            description=f"Your dataset {dataset_name} has reached the maximum number of rows it can hold ({plotvars.max_rows}). Please use `/removerow` to remove rows from your dataset or use a different dataset."
-            await ctx.send(embed=utils.error_embed(description))
-            return None
 
     return datadict
 

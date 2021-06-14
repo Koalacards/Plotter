@@ -10,13 +10,34 @@ import os
 import asyncutils
 
 
-class PlotGenerationCommands(commands.Cog):
+class Scatterplot(commands.Cog):
     
-    @cog_ext.cog_slash(name='scatterplot', guild_ids=guild_ids, description="Create a scatterplot")
+    @cog_ext.cog_slash(name='scatterplot', guild_ids=guild_ids, description="Generates a scatterplot!")
     async def scatterplot(self, ctx, dataset_name, x_row:str, y_row:str, x_label:str="", y_label:str="", size_row:str="", color_row_or_one_color:str="", transparency:float=1, saveas:str=""):
+        #Creates a scatterplot by calling the _scatterplot method
         await self._scatterplot(ctx, dataset_name, x_row, y_row, x_label, y_label, size_row, color_row_or_one_color, transparency, saveas)
 
     async def _scatterplot(self, ctx, dataset_name, x_row:str, y_row:str, x_label:str="", y_label:str="", size_row:str="", color_row_or_one_color:str="", transparency:float=1, saveas:str=""):
+        """Generates a scatterplot with the given arguments.
+            This method also sanitizes all inputs so the matplotlib generation does not fail.
+
+            Sanitation that is done:
+            - Makes sure that X, Y and size rows are rows of numbers
+            - Makes sure that the colors input is a row of colors or just one color (if applicable)
+            - Makes sure that all applicable rows have the same length
+            - Makes sure that the transparency of the dots is in between 0 and 1
+
+        Args:
+            dataset_name ([type]): Name of the dataset
+            x_row (str): Name of a row in the dataset that will correspond to the X values in the scatterplot
+            y_row (str): Name of a row in the dataset that will correspond to the Y values in the scatterplot
+            x_label (str, optional): The label given to the X values. Defaults to "", and will just use the name of the X row if empty.
+            y_label (str, optional): The label given to the Y values. Defaults to "", and will just use the name of the Y row if empty.
+            size_row (str, optional): Name of a row in the dataset that will correspond to the sizes of the dots in the scatterplot. Defaults to "", where all the sizes will be default.
+            color_row_or_one_color (str, optional): EITHER the name of a row in the dataset that corresponds to the colors of the dots, or one color for all of the dots to be. Defaults to "", where a matplotlib default color will be used.
+            transparency (float, optional): How transparent the dots in the scatterplot are. Defaults to 1.
+            saveas (str, optional): Name to save the graph as in the dataset. Defaults to "", in which the graph will not be saved.
+        """
         author = ctx.author
 
         #Get the data
@@ -47,9 +68,10 @@ class PlotGenerationCommands(commands.Cog):
                 utils.verify_string_is_color(color_row_or_one_color)
                 color_values = color_row_or_one_color
             except:
-                description=f"Your color input was neither the name of a row in the database nor a single color. Please check the input and try again."
-                await ctx.send(embed=utils.error_embed(description))
-                return
+                if color_row_or_one_color != "": 
+                    description=f"Your color input was neither the name of a row in the database nor a single color. Please check the input and try again."
+                    await ctx.send(embed=utils.error_embed(description))
+                    return
         else:
             color_values = check_color_row[0]
 
@@ -89,6 +111,7 @@ class PlotGenerationCommands(commands.Cog):
         colors_npy = None if color_row_or_one_color == "" else colors_npy
 
         #Create the matplotlib graph
+        plt.figure()
         plt.scatter(x_npy, y_npy, s=size_npy, c=colors_npy, alpha=transparency)
         potential_title=dbfunc.get_plot_title(author.id, dataset_name)
         plt.title(potential_title)
@@ -142,4 +165,4 @@ class PlotGenerationCommands(commands.Cog):
         
 
 def setup(bot):
-    bot.add_cog(PlotGenerationCommands(bot))
+    bot.add_cog(Scatterplot(bot))

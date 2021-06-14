@@ -4,12 +4,20 @@ import utils
 import plotvars
 from plotvars import guild_ids
 import asyncutils
-from cogs.plotgenerationcommands import PlotGenerationCommands as gencmd
+from cogs.plots.scatterplot import Scatterplot as scatterplot
 
 class SavedPlotGeneration(commands.Cog):
 
-    @cog_ext.cog_slash(name='plotgenerate', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='plotgenerate', guild_ids=guild_ids, description="Generates a saved plot from one of yoru datasets!")
     async def plotgenerate(self, ctx, dataset_name:str, saved_plot_name:str):
+        """Generates a saved plot from a dataset.
+
+        This method will essentially run the graph command without the user having to input a ton of information
+
+        Args:
+            dataset_name (str): name of the dataset
+            saved_plot_name (str): Name of the saved plot a user generated earlier
+        """
 
         #Get the graph data
         graph_data_dict = await asyncutils.get_graph_data_dictionary(ctx, dataset_name)
@@ -54,7 +62,7 @@ class SavedPlotGeneration(commands.Cog):
             await ctx.send(embed=utils.error_embed(error_msg))
             return
         
-        await gencmd._scatterplot(gencmd, ctx, dataset_name, x_row, y_row, x_label, y_label, size_row, color_row_or_one_color, transparency)
+        await scatterplot._scatterplot(scatterplot, ctx, dataset_name, x_row, y_row, x_label, y_label, size_row, color_row_or_one_color, transparency)
         
 
         

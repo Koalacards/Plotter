@@ -7,8 +7,14 @@ import plotvars
 from plotvars import guild_ids
 
 class PlotFeatureCommands(commands.Cog):
-    @cog_ext.cog_slash(name='setplottitle', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='setplottitle', guild_ids=guild_ids, description="Set the plot title for your dataset!")
     async def setplottitle(self, ctx, dataset_name:str, plot_title:str):
+        """Sets a plot title for your dataset.
+
+        Args:
+            dataset_name (str): Name of the dataset
+            plot_title (str): Title of the plot
+        """
         author = ctx.author
         dbfunc.set_plot_title(author.id, dataset_name, plot_title)
         title=f"Plot title of `{plot_title}` has been set for dataset {dataset_name}!"
@@ -16,8 +22,17 @@ class PlotFeatureCommands(commands.Cog):
         colour=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, colour))
     
-    @cog_ext.cog_slash(name='setaxisboundaries', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='setaxisboundaries', guild_ids=guild_ids, description="Set specific lengths for your X and Y axes! (Overrides axis options)")
     async def setaxisboundaries(self, ctx, dataset_name:str, minimum_x:float, maximum_x:float, minimum_y: float, maximum_y: float):
+        """Sets specific axis boundaries (minimums and maximums for x and y) for a specific dataset.
+
+        Args:
+            dataset_name (str): Name of the dataset
+            minimum_x (float): Minimum X value for the axis
+            maximum_x (float): Maximum X value for the axis
+            minimum_y (float): Minimum Y value for the axis
+            maximum_y (float): Maximum Y value for the axis
+        """
         try:
             author = ctx.author
             bounds = [float(minimum_x), float(maximum_x), float(minimum_y), float(maximum_y)]
@@ -30,8 +45,16 @@ class PlotFeatureCommands(commands.Cog):
             description=f"One of your boundary inputs was not a float. Please try again or reference `/help setaxisboundaries` for more information."
             await ctx.send(embed=utils.error_embed(description))
         
-    @cog_ext.cog_slash(name='setaxisoption', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='setaxisoption', guild_ids=guild_ids, description="Set axis mode to a certain option! (Overrides axis boundaries)")
     async def setaxisoption(self, ctx, dataset_name:str, option:str):
+        """Sets a specific axis option for a dataset.
+
+        Options are based on the axis options that matplotlib has.
+
+        Args:
+            dataset_name (str): Name of the dataset
+            option (str): Axis option
+        """
         author = ctx.author
         correct_option=False
         if option == "on":

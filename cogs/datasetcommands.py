@@ -9,17 +9,15 @@ import asyncutils
 import os
 
 class DataSetCommands(commands.Cog):
-    @cog_ext.cog_slash(name='ping', guild_ids=guild_ids)
-    async def ping(self, ctx):
-        await ctx.send("pong!")
 
-    @cog_ext.cog_slash(name='createdataset', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='createdataset', guild_ids=guild_ids, description="Creates a dataset with a given name!")
     async def createdataset(self, ctx, name:str):
+        """Creates a dataset for the user and adds it to the database.
+
+        Args:
+            name (str): Name of the dataset
+        """
         author = ctx.author
-        if dbfunc.get_num_datasets(author.id) >= plotvars.max_datasets:
-            description=f"You have reached your maximum of `{plotvars.max_datasets}` datasets. You can delete your existing datasets using `/removedataset <dataset_name>`"
-            await ctx.send(embed=utils.error_embed(description))
-            return
         try:
             dbfunc.set_dataset(author.id, name)
 
@@ -32,8 +30,13 @@ class DataSetCommands(commands.Cog):
             await ctx.send(embed=utils.error_embed(description))
             return
 
-    @cog_ext.cog_slash(name='removedataset', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='removedataset', guild_ids=guild_ids, description="Removes a dataset with a given name")
     async def removedataset(self, ctx, name:str):
+        """Removes a user's dataset from the database (if they have one with the given name)
+
+        Args:
+            name (str): name of the dataset to remove
+        """
         author = ctx.author
         num_removed = dbfunc.remove_dataset(author.id, name)
         if num_removed == 0:
@@ -45,11 +48,22 @@ class DataSetCommands(commands.Cog):
             color=discord.Color.green()
             await ctx.send(embed=utils.create_embed(title, description, color))
     
-    @cog_ext.cog_slash(name='addnumberrow', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='addnumberrow', guild_ids=guild_ids, description="Add a row of numbers to your dataset!")
     async def addnumberrow(self, ctx, dataset_name:str, row_name:str, numbers:str, separator:str=" "):
+        """Adds a row of numbers to the data in a user's dataset. The user enters a list of numbers using a
+        separator of their choice (default is " "). 
+
+        If the name of the row already exists, the numbers will be added to the end of that row.
+
+        Args:
+            dataset_name (str): Name of the dataset to add the data to
+            row_name (str): Name of the row
+            numbers (str): Numbers, listed out with the separator of their choice
+            separator (str, optional): The separator for the user's list of numbers.  Defaults to " ".
+        """
 
         #Get the data
-        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name)
         if datadict is None:
             return
 
@@ -83,11 +97,22 @@ class DataSetCommands(commands.Cog):
         await ctx.send(embed=utils.create_embed(title, description, color))
 
 
-    @cog_ext.cog_slash(name='addstringrow', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='addstringrow', guild_ids=guild_ids, description="Add a row of strings to your dataset!")
     async def addstringrow(self, ctx, dataset_name:str, row_name:str, strings:str, separator:str=" "):
+        """Adds a row of strings to the data in a user's dataset. The user enters a list of strings using a
+        separator of their choice (default is " "). 
+
+        If the name of the row already exists, the strings will be added to the end of that row.
+
+        Args:
+            dataset_name (str): Name of the dataset to add the data to
+            row_name (str): Name of the row
+            strings (str): Strings, listed out with the separator of their choice
+            separator (str, optional): The separator for the user's list of strings.  Defaults to " ".
+        """
 
         #Get the data
-        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name)
         if datadict is None:
             return
 
@@ -120,10 +145,22 @@ class DataSetCommands(commands.Cog):
         color=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, color))
 
-    @cog_ext.cog_slash(name='addrandomnumrow', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='addrandomnumrow', guild_ids=guild_ids, description="Generate a random row of numbers for your dataset!")
     async def addrandomnumberrow(self, ctx, dataset_name:str, row_name:str, amount_of_random_numbers:int, minimum_number:float, maximum_number:float):
+        """Adds a random row of numbers to a user's dataset, with them choosing the bounds between the numbers and
+        amount of numbers.
+
+        If the name of the row already exists, the numbers will be added to the end of that row.
+
+        Args:
+            dataset_name (str): Name of the dataset
+            row_name (str): Name of the row
+            amount_of_random_numbers (int): Amount of random numbers to be generated
+            minimum_number (float): Minimum possible number of the random numbers
+            maximum_number (float): Maximum possible number of the random numbers
+        """
         #Get the data
-        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name)
         if datadict is None:
             return
 
@@ -157,8 +194,14 @@ class DataSetCommands(commands.Cog):
         color=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, color))
 
-    @cog_ext.cog_slash(name='viewdata', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='viewdata', guild_ids=guild_ids, description="View your data from a specific dataset!")
     async def viewdata(self, ctx, dataset_name:str):
+        """Gives the user a list of their rows of data in a certain dataset,
+         along with their constant graph properties.
+
+        Args:
+            dataset_name (str): Name of the dataset
+        """
         author = ctx.author
         #Get the data
         datadict = await asyncutils.get_data_dictionary(ctx, dataset_name)
@@ -179,8 +222,14 @@ class DataSetCommands(commands.Cog):
             msg = f"Your data was unable to be sent, most likely due to discord's message character limit. Use `/viewdataintxt` to get the data with no character limit."
             await ctx.send(embed=utils.error_embed(msg))
 
-    @cog_ext.cog_slash(name='viewdataintxt', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='viewdataintxt', guild_ids=guild_ids, description="Get a txt file with your data from a specific dataset!")
     async def viewdataintxt(self, ctx, dataset_name:str):
+        """Gives the user a list of their rows of data in a certain dataset as a .txt file,
+         along with their constant graph properties.
+
+        Args:
+            dataset_name (str): Name of the dataset
+        """
         author = ctx.author
         #Get the data
         datadict = await asyncutils.get_data_dictionary(ctx, dataset_name)
@@ -202,8 +251,13 @@ class DataSetCommands(commands.Cog):
 
         os.remove(txtfile)
 
-    @cog_ext.cog_slash(name='viewgraphdata', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='viewgraphdata', guild_ids=guild_ids, description="View your saved graphs from a specific dataset!")
     async def viewgraphdata(self, ctx, dataset_name:str):
+        """Gives the user a list of their saved graphs in a certain dataset.
+
+        Args:
+            dataset_name (str): Name of the dataset
+        """
         #Get the graph data
         graph_data_dict = await asyncutils.get_graph_data_dictionary(ctx, dataset_name)
         if graph_data_dict is None:
@@ -221,8 +275,13 @@ class DataSetCommands(commands.Cog):
             msg = f"Your data was unable to be sent, most likely due to discord's message character limit. Use `/viewdataintxt` to get the data with no character limit."
             await ctx.send(embed=utils.error_embed(msg))
 
-    @cog_ext.cog_slash(name='viewgraphdataintxt', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='viewgraphdataintxt', guild_ids=guild_ids, description="Get a txt file with your saved graphs from a specific dataset!")
     async def viewgraphdataintxt(self, ctx, dataset_name:str):
+        """Gives the user a list of their saved graphs in a certain dataset as a txt file
+
+        Args:
+            dataset_name (str): Name of the dataset
+        """
         author = ctx.author
         #Get the data
         graph_data_dict = await asyncutils.get_graph_data_dictionary(ctx, dataset_name)
@@ -243,16 +302,25 @@ class DataSetCommands(commands.Cog):
 
         os.remove(txtfile)
 
-    @cog_ext.cog_slash(name='viewdatasets', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='viewdatasets', guild_ids=guild_ids, description="View all of the datasets you have!")
     async def viewdatasets(self, ctx):
+        """Gives the user a list of datasets they currently have.
+
+        """
         author = ctx.author
         title=f'{author.name}\'s datasets:'
         description = dbfunc.get_names_of_datasets(author.id)
         color=discord.Color.orange()
         await ctx.send(embed=utils.create_embed(title=title, description=description, color=color))
 
-    @cog_ext.cog_slash(name='removerow', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='removerow', guild_ids=guild_ids, description="Removes a row of data from your dataset!")
     async def removerow(self, ctx, dataset_name:str, row_name:str):
+        """Removes a row of data from a user's dataset.
+
+        Args:
+            dataset_name (str): Name of the dataset
+            row_name (str): Name of the row to remove
+        """
         #Get the data
         datadict = await asyncutils.get_data_dictionary(ctx, dataset_name)
         if datadict is None:
@@ -277,10 +345,21 @@ class DataSetCommands(commands.Cog):
         await ctx.send(embed=utils.create_embed(title, description, color))
 
     
-    @cog_ext.cog_slash(name='addcolorrow', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='addcolorrow', guild_ids=guild_ids, description="Add a row of hex color codes to your dataset!")
     async def addcolorrow(self, ctx, dataset_name:str, row_name:str, colors:str, separator:str=" "):
+        """Adds a row of hex color strings to the data in a user's dataset. The user enters a list of colors using a
+        separator of their choice (default is " "). 
+
+        If the name of the row already exists, the strings will be added to the end of that row.
+
+        Args:
+            dataset_name (str): Name of the dataset to add the data to
+            row_name (str): Name of the row
+            strings (str): Color strings (in hex code format), listed out with the separator of their choice
+            separator (str, optional): The separator for the user's list of strings.  Defaults to " ".
+        """
         #Get the data
-        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name)
         if datadict is None:
             return
 
@@ -314,10 +393,20 @@ class DataSetCommands(commands.Cog):
         await ctx.send(embed=utils.create_embed(title, description, color))
 
 
-    @cog_ext.cog_slash(name='addrandomcolorrow', guild_ids=guild_ids)
+    @cog_ext.cog_slash(name='addrandomcolorrow', guild_ids=guild_ids, description="Generates a random row of hex color codes for your dataset!")
     async def addrandomcolorrow(self, ctx, dataset_name:str, row_name:str, amount_of_random_colors:int):
+        """Adds a random row of hex color strings to a user's dataset,
+         with them choosing the amount of colors.
+
+        If the name of the row already exists, the numbers will be added to the end of that row.
+
+        Args:
+            dataset_name (str): Name of the dataset
+            row_name (str): Name of the row
+            amount_of_random_colors (int): Amount of random colors to be generated
+        """
         #Get the data
-        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name, check_length=True)
+        datadict = await asyncutils.get_data_dictionary(ctx, dataset_name)
         if datadict is None:
             return
     
