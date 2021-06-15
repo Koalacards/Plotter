@@ -1,7 +1,6 @@
 from re import X
 import discord
 from discord.ext import commands
-import db.plotdbfunctions as dbfunc
 from discord_slash import cog_ext
 import utils
 import plotvars

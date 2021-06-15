@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 from discord_slash import SlashCommand, SlashContext
 from confidential import *
+import plotvars
+import utils
 from plotvars import guild_ids
 
 
@@ -17,6 +19,7 @@ client.load_extension('cogs.plotfeaturecommands')
 client.load_extension('cogs.plots.scatterplot')
 client.load_extension('cogs.helpcommand')
 client.load_extension('cogs.savedplotgeneration')
+client.load_extension('cogs.utilitycommands')
 
 @client.event
 async def on_ready():
@@ -29,6 +32,7 @@ async def reloadCog(ctx, cog):
         client.reload_extension(cog)
         await ctx.send("Cog has been reloaded")
     else:
-        await ctx.send("You are not my creator")
+        await ctx.send("You are not my creator")\
+
 
 client.run(RUN_ID)
