@@ -101,5 +101,20 @@ async def verify_rows_are_rows_of_numbers(ctx, dataset_name:str, datadict, rows)
             return None
     
     return row_values
+
+
+async def save_graph_data(ctx, dataset_name:str, saveas:str,  graph_data):
+    #Get the pre-existing graph data
+    graph_data_dict = await get_graph_data_dictionary(ctx, dataset_name)
+    if graph_data_dict is None:
+        return
+    
+    #Set the dictionary value for the saveas to be the graph data
+    graph_data_dict[saveas] = graph_data
+
+    #Write the graph data to the database
+    graph_data_written = await log_graph_data_to_database(ctx, dataset_name, graph_data_dict)
+    if graph_data_written == False:
+        return
     
 

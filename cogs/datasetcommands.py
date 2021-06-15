@@ -189,7 +189,7 @@ class DataSetCommands(commands.Cog):
         if data_written == False:
             return
         
-        title=f"`{amount_of_random_numbers}` random number values of range `{minimum_number}` to `{maximum_number}` have been added to the `{row_name}` row! To view the values use `/viewdata `{dataset_name}`"
+        title=f"`{amount_of_random_numbers}` random number values of range `{minimum_number}` to `{maximum_number}` have been added to the `{row_name}` row! To view the values use `/viewdata {dataset_name}`"
         description=""
         color=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, color))
