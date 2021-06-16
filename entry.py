@@ -32,7 +32,7 @@ async def reloadCog(ctx, cog):
         client.reload_extension(cog)
         await ctx.send("Cog has been reloaded")
     else:
-        await ctx.send("You are not my creator")\
+        await ctx.send("You are not my creator")
 
 
 client.run(RUN_ID)

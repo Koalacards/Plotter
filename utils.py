@@ -99,8 +99,9 @@ def sanitize_axis_info(author, dataset_name:str):
 #Check if the list of keys inputted have values attached
 def check_values_exist_for_keys(ref_dict: Dict, keys: List[str]) -> bool:
     for key in keys:
-        value = ref_dict.get(key, None)
-        if value is None:
+        try:
+            ref_dict[key]
+        except:
             return False
-    
+        
     return True

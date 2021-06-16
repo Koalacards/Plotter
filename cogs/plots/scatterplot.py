@@ -19,7 +19,9 @@ class Scatterplot(commands.Cog):
         #Creates a scatterplot by calling the _scatterplot method
         await self._scatterplot(ctx, dataset_name, x_row, y_row, x_label, y_label, size_row, color_row_or_one_color, transparency, saveas)
 
-    async def _scatterplot(self, ctx, dataset_name:str, x_row:str, y_row:str, x_label:str="", y_label:str="", size_row:str="", color_row_or_one_color:str="", transparency:float=1, saveas:str=""):
+    async def _scatterplot(self, ctx, dataset_name:str, x_row:str, y_row:str, x_label:str="", y_label:str="",
+     size_row:str="", color_row_or_one_color:str="", transparency:float=1, saveas:str="",
+     save_and_close:bool=True, create_figure:bool=True, set_common_plot_info:bool=True, send_message:bool=True):
         """Generates a scatterplot with the given arguments.
             This method also sanitizes all inputs so the matplotlib generation does not fail.
 
@@ -39,6 +41,10 @@ class Scatterplot(commands.Cog):
             color_row_or_one_color (str, optional): EITHER the name of a row in the dataset that corresponds to the colors of the dots, or one color for all of the dots to be. Defaults to "", where a matplotlib default color will be used.
             transparency (float, optional): How transparent the dots in the scatterplot are. Defaults to 1.
             saveas (str, optional): Name to save the graph as in the dataset. Defaults to "", in which the graph will not be saved.
+            save_and_close(bool, optional): Whether or not to save the figure and clear data(used in combination graphs)
+            create_figure(bool, optional): Whether or not to create a new matplotlib figure(used in combination graphs)
+            set_common_plot_info(bool, optional): Whether or not to set the common plot info for a figure(used in combination graphs)
+            send_message(bool, optional): Whether or not to send the message with the plot in it (used in combination graphs)
         """
         author = ctx.author
 
@@ -61,21 +67,27 @@ class Scatterplot(commands.Cog):
         alpha = answer_dict["alpha"]
 
         #Create the matplotlib graph
-        plothelpers.create_figure()
-        plothelpers.set_common_plot_info(author, dataset_name, x_label, y_label)
+        if create_figure:
+                plothelpers.create_figure()
+        
+        if set_common_plot_info:
+                plothelpers.set_common_plot_info(ctx.author, dataset_name, x_label, y_label)
+        
         create_plot(x, y, size, color, alpha)
 
         
         file_name = f'plot_{dataset_name}.png'
         
-        plothelpers.save_and_close(file_name)
-        
-        file=discord.File(file_name)
-        description=f"Plot has been saved as {saveas}! Use `/viewgraphdata {dataset_name}` to view the graph data and `/plotgenerate {dataset_name} {saveas}` to generate the plot again." if saveas != "" else ""
-        plot_embed = utils.create_embed(f"Scatterplot for {author.name}", description, discord.Color.dark_orange())
-        plot_embed.set_image(url=f"attachment://{file_name}")
-        await ctx.send(embed=plot_embed, file=file)
-        os.remove(file_name)
+        if save_and_close:
+            plothelpers.save_and_close(file_name)
+
+        if save_and_close and send_message:
+            file=discord.File(file_name)
+            description=f"Plot has been saved as {saveas}! Use `/viewgraphdata {dataset_name}` to view the graph data and `/plotgenerate {dataset_name} {saveas}` to generate the plot again." if saveas != "" else ""
+            plot_embed = utils.create_embed(f"Scatterplot for {author.name}", description, discord.Color.dark_orange())
+            plot_embed.set_image(url=f"attachment://{file_name}")
+            await ctx.send(embed=plot_embed, file=file)
+            os.remove(file_name)
 
 
         if saveas != "":
