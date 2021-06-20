@@ -8,6 +8,7 @@ from plotvars import guild_ids
 import asyncutils
 from cogs.plots.scatterplot import Scatterplot
 import os
+import cogs.plots.plothelpers as plothelpers
 
 class SavedPlotGeneration(commands.Cog):
 
@@ -37,14 +38,56 @@ class SavedPlotGeneration(commands.Cog):
         """
         await self._plotcombine(ctx, dataset_name, first_plot_name, second_plot_name, saveas)
 
-    async def _plotcombine(self, ctx, dataset_name:str, first_plot_name:str, second_plot_name:str, saveas:str=""):
+    async def _plotcombine(self, ctx, dataset_name:str, first_plot_name:str, second_plot_name:str, saveas:str="",
+     figure_created:bool=False, first_combine:bool=True):
         author = ctx.author
 
-        await self._plotgenerate(ctx, dataset_name, first_plot_name, False, True, True, False)
+        #Determine if the plots are combination plots
+        first_plot_type = await asyncutils.get_saved_plot_type(ctx, dataset_name, first_plot_name)
+        second_plot_type = await asyncutils.get_saved_plot_type(ctx, dataset_name, second_plot_name)
+        
+        new_first_plot_is_combo = False
 
-        await self._plotgenerate(ctx, dataset_name, second_plot_name, True, False, False, False)
+        if first_plot_type == "combo":
+            new_first_plot_is_combo = True
+
+        #Defaults for the various plot settings
+        first_create_figure = False
+        first_set_common_plot_info = False
+
+        new_figure_created=figure_created
+        #If this is the very first plot to be created, create the figure and set the common plot info
+        if new_first_plot_is_combo == False and figure_created == False:
+            first_create_figure = True
+            first_set_common_plot_info = True
+            new_figure_created = True
+
+        print(f"Generating: {first_plot_name} {first_plot_type}")
+
+        await self._plotgenerate(ctx, dataset_name, first_plot_name,
+         False, first_create_figure, first_set_common_plot_info, False,
+          new_figure_created, False)
+
+        print(f"{first_plot_name} {first_plot_type} : Generated")
+
+        print(f"Generating: {second_plot_name} {second_plot_type}")
+
+        await self._plotgenerate(ctx, dataset_name, second_plot_name,
+         False, False, False, False,
+          True, False)
+
+        print(f"{second_plot_name} {second_plot_type}: Generated")
+
+        
+        #Once we have finish combining, print out the plot
+        if first_combine == False:
+            return
+
+        print("Getting ready to send the plot")
         
         file_name = f'plot_{dataset_name}.png'
+
+        plothelpers.save_and_close(file_name)
 
         file = discord.File(file_name)
 
@@ -66,26 +109,21 @@ class SavedPlotGeneration(commands.Cog):
  
 
 
-    async def _plotgenerate(self, ctx, dataset_name:str, saved_plot_name:str, save_and_close:bool=True, create_figure:bool=True, set_common_plot_info:bool=True, send_message:bool=True):
-        #Get the graph data
-        graph_data_dict = await asyncutils.get_graph_data_dictionary(ctx, dataset_name)
-        if graph_data_dict is None:
-            return
-
-        #Get the saved plot dictionary or error if none is available
-        saved_plot_dict = graph_data_dict.get(saved_plot_name, None)
-
-        if saved_plot_dict is None:
-            error_msg = f"You do not have a saved plot under the name {saved_plot_name}! Please check the name using `/viewgraphdata {dataset_name}` and try again."
-            await ctx.send(embed=utils.error_embed(error_msg))
+    async def _plotgenerate(self, ctx, dataset_name:str, saved_plot_name:str, save_and_close:bool=True,
+     create_figure:bool=True, set_common_plot_info:bool=True, send_message:bool=True,
+      figure_created:bool=False, first_combine:bool=True):
+        
+        #Get the graph type
+        saved_plot_dict = await asyncutils.get_saved_plot_dict(ctx, dataset_name, saved_plot_name)
         
 
         #Iterate through the different graph names to determine which type of graph to plot
         graph_name = saved_plot_dict["name"]
         if graph_name == "scatterplot":
-            await self._generatescatter(ctx, dataset_name, saved_plot_dict, save_and_close, create_figure, set_common_plot_info, send_message)
+            await self._generatescatter(ctx, dataset_name, saved_plot_dict, save_and_close,
+             create_figure, set_common_plot_info, send_message)
         elif graph_name == "combo":
-            await self._generatecombo(ctx, dataset_name, saved_plot_dict)
+            await self._generatecombo(ctx, dataset_name, saved_plot_dict, figure_created, first_combine)
         else:
             error_msg= f"An error occurred on our end when generating the plot: Incorrect plot name stored in DB. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
             await ctx.send(embed=utils.error_embed(error_msg))
@@ -111,9 +149,11 @@ class SavedPlotGeneration(commands.Cog):
         scatterplot = Scatterplot()
         await scatterplot._scatterplot(ctx, dataset_name, x_row, y_row, x_label,
          y_label, size_row, color_row_or_one_color, transparency,
-         save_and_close=save_and_close, create_figure=create_figure, set_common_plot_info=set_common_plot_info, send_message=send_message)
+         save_and_close=save_and_close, create_figure=create_figure,
+          set_common_plot_info=set_common_plot_info, send_message=send_message)
 
-    async def _generatecombo(self, ctx, dataset_name:str, saved_plot_dict):
+    async def _generatecombo(self, ctx, dataset_name:str, saved_plot_dict,
+     figure_created:bool, first_combine:bool):
         keys = ["plot1", "plot2"]
         values_exist = utils.check_values_exist_for_keys(saved_plot_dict, keys)
 
@@ -125,7 +165,9 @@ class SavedPlotGeneration(commands.Cog):
         plot1 = saved_plot_dict["plot1"]
         plot2 = saved_plot_dict["plot2"]
 
-        await self._plotcombine(ctx, dataset_name, plot1, plot2)
+        await self._plotcombine(ctx, dataset_name, plot1, plot2,
+          figure_created=figure_created,
+            first_combine=first_combine)
 
             
         

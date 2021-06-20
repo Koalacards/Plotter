@@ -116,5 +116,31 @@ async def save_graph_data(ctx, dataset_name:str, saveas:str,  graph_data):
     graph_data_written = await log_graph_data_to_database(ctx, dataset_name, graph_data_dict)
     if graph_data_written == False:
         return
+
+
+async def get_saved_plot_dict(ctx, dataset_name:str, saved_plot_name:str):
+    graph_dict = await get_graph_data_dictionary(ctx, dataset_name)
+
+    #Get the saved plot dictionary or error if none is available
+    saved_plot_dict = graph_dict.get(saved_plot_name, None)
+
+    if saved_plot_dict is None:
+        error_msg = f"You do not have a saved plot under the name {saved_plot_name}! Please check the name using `/viewgraphdata {dataset_name}` and try again."
+        await ctx.send(embed=utils.error_embed(error_msg))
+        return None
+
+    return saved_plot_dict
+
+async def get_saved_plot_type(ctx, dataset_name:str, saved_plot_name:str):
+    graph_dict = await get_graph_data_dictionary(ctx, dataset_name)
+
+    #Get the saved plot dictionary or error if none is available
+    saved_plot_dict = graph_dict.get(saved_plot_name, None)
+
+    if saved_plot_dict is None:
+        error_msg = f"You do not have a saved plot under the name {saved_plot_name}! Please check the name using `/viewgraphdata {dataset_name}` and try again."
+        await ctx.send(embed=utils.error_embed(error_msg))
+        return None
     
+    return saved_plot_dict["name"]
 
