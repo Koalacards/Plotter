@@ -20,6 +20,7 @@ client.load_extension('cogs.plots.scatterplot')
 client.load_extension('cogs.helpcommand')
 client.load_extension('cogs.savedplotgeneration')
 client.load_extension('cogs.utilitycommands')
+client.load_extension('cogs.plots.bargraph')
 
 @client.event
 async def on_ready():

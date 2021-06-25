@@ -1,11 +1,13 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
+from matplotlib.pyplot import bar
 import utils
 import plotvars
 from plotvars import guild_ids
 import asyncutils
 from cogs.plots.scatterplot import Scatterplot
+from cogs.plots.bargraph import BarGraph
 import os
 import cogs.plots.plothelpers as plothelpers
 
@@ -110,6 +112,9 @@ class SavedPlotGeneration(commands.Cog):
         if graph_name == "scatterplot":
             await self._generatescatter(ctx, dataset_name, saved_plot_dict, save_and_close,
              create_figure, set_common_plot_info, send_message)
+        elif graph_name == "bargraph":
+            await self._generatebar(ctx, dataset_name, saved_plot_dict, save_and_close, create_figure,
+            set_common_plot_info, send_message)
         elif graph_name == "combo":
             await self._generatecombo(ctx, dataset_name, saved_plot_dict, figure_created, first_combine)
         else:
@@ -137,6 +142,30 @@ class SavedPlotGeneration(commands.Cog):
         scatterplot = Scatterplot()
         await scatterplot._scatterplot(ctx, dataset_name, x_row, y_row, x_label,
          y_label, size_row, color_row_or_one_color, transparency,
+         save_and_close=save_and_close, create_figure=create_figure,
+          set_common_plot_info=set_common_plot_info, send_message=send_message)
+
+    async def _generatebar(self, ctx, dataset_name:str, saved_plot_dict, save_and_close:bool, create_figure:bool, set_common_plot_info:bool, send_message:bool):
+        keys = ["x_row", "height_row", "x_label", "y_label", "width", "bottom_coords_row", "align", "color_row_or_one_color"]
+        values_exist = utils.check_values_exist_for_keys(saved_plot_dict, keys)
+
+        if values_exist == False:
+            error_msg = f"An error occured on our end when generating the bar graph: Plot dictionary does not have one or more necessary values. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+            await ctx.send(embed=utils.error_embed(error_msg))
+            return None
+
+        x_row = saved_plot_dict["x_row"]
+        height_row = saved_plot_dict["height_row"]
+        x_label = saved_plot_dict["x_label"]
+        y_label = saved_plot_dict["y_label"]
+        width = saved_plot_dict["width"]
+        bottom_coords_row = saved_plot_dict["bottom_coords_row"]
+        align = saved_plot_dict["align"]
+        color_row_or_one_color = saved_plot_dict["color_row_or_one_color"]
+
+        bargraph = BarGraph()
+        await bargraph._bargraph(ctx, dataset_name, x_row, height_row, x_label,
+         y_label, width, bottom_coords_row, align, color_row_or_one_color,
          save_and_close=save_and_close, create_figure=create_figure,
           set_common_plot_info=set_common_plot_info, send_message=send_message)
 

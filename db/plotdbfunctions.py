@@ -4,7 +4,7 @@ from db.plotmodels import *
 def set_dataset(user_id:int, ds_name:str):
     query = DatasetEntries.select().where(DatasetEntries.user_id == user_id and DatasetEntries.ds_name == ds_name)
     if len(query) == 0:
-        DatasetEntries.create(user_id=user_id, ds_name=ds_name, data="{}", plot_title=ds_name, axis_info="on", graph_data={})
+        DatasetEntries.create(user_id=user_id, ds_name=ds_name, data="{}", plot_title=ds_name, axis_info="on", graph_data={}, x_ticks={}, y_ticks={})
     else:
         raise Exception("Dataset already exists with user id and ds_name")
 
