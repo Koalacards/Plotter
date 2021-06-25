@@ -1,6 +1,6 @@
 import json
 from json.decoder import JSONDecodeError
-from typing import Dict, List
+from typing import Dict, List, Optional
 import discord
 import random
 import db.plotdbfunctions as dbfunc
@@ -105,3 +105,4 @@ def check_values_exist_for_keys(ref_dict: Dict, keys: List[str]) -> bool:
             return False
         
     return True
+    

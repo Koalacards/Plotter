@@ -16,6 +16,8 @@ class DatasetEntries(BaseModel):
     graph_data = TextField(null=True)
     plot_title = TextField(null=True)
     user_id = IntegerField(null=True)
+    x_ticks = TextField(null=True)
+    y_ticks = TextField(null=True)
 
     class Meta:
         table_name = 'DatasetEntries'

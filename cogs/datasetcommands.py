@@ -216,6 +216,14 @@ class DataSetCommands(commands.Cog):
         description+=f"Plot Title: {dbfunc.get_plot_title(author.id, dataset_name)}\n"
         description+=f"Axis info: {dbfunc.get_axis_info(author.id,dataset_name)}\n"
 
+        #Get the x ticks data
+        xticksdict = await asyncutils.get_xticks_dictionary(ctx, dataset_name)
+        description+= f"X Ticks Dictionary: {str(xticksdict)}\n"
+
+        #Get the y ticks data
+        yticksdict = await asyncutils.get_yticks_dictionary(ctx, dataset_name)
+        description+= f"Y Ticks Dictionary: {str(yticksdict)}\n"
+
         try:   
             await ctx.send(embed=utils.create_embed(title=title, description=description, color=color))
         except:

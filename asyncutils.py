@@ -144,3 +144,94 @@ async def get_saved_plot_type(ctx, dataset_name:str, saved_plot_name:str):
     
     return saved_plot_dict["name"]
 
+
+async def get_xticks_dictionary(ctx, dataset_name:str):
+    author = ctx.author
+    ticksstr = None
+    #Recieve ticks data in string format from db
+    try:
+        ticksstr= dbfunc.get_x_ticks(author.id, dataset_name)
+    except:
+        description=f"You don't have a dataset with the name `{dataset_name}`!"
+        await ctx.send(embed=utils.error_embed(description))
+        return None
+
+    #Turn ticks data in string format to dict format (this should only fail if the bot did something wrong)
+    ticksdict = None
+    try:
+        ticksdict=utils.str2dict(ticksstr)
+    except:
+        description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+        await ctx.send(embed=utils.error_embed(description))
+        return None
+
+    return ticksdict
+
+async def log_xticks_to_database(ctx, dataset_name:str, ticksdict) -> bool:
+    author = ctx.author
+    #add the new data to the database
+    dict2str = str(ticksdict)
+    try:
+        dbfunc.set_x_ticks(author.id, dataset_name, dict2str)
+    except:
+        description=f"An error happened with the ticks data upload on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+        await ctx.send(embed=utils.error_embed(description))
+        return False
+    
+    return True
+
+async def get_yticks_dictionary(ctx, dataset_name:str):
+    author = ctx.author
+    ticksstr = None
+    #Recieve ticks data in string format from db
+    try:
+        ticksstr= dbfunc.get_y_ticks(author.id, dataset_name)
+    except:
+        description=f"You don't have a dataset with the name `{dataset_name}`!"
+        await ctx.send(embed=utils.error_embed(description))
+        return None
+
+    #Turn ticks data in string format to dict format (this should only fail if the bot did something wrong)
+    ticksdict = None
+    try:
+        ticksdict=utils.str2dict(ticksstr)
+    except:
+        description=f"An error happened with the dictionary formatting on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+        await ctx.send(embed=utils.error_embed(description))
+        return None
+
+    return ticksdict
+
+async def log_yticks_to_database(ctx, dataset_name:str, ticksdict) -> bool:
+    author = ctx.author
+    #add the new data to the database
+    dict2str = str(ticksdict)
+    try:
+        dbfunc.set_y_ticks(author.id, dataset_name, dict2str)
+    except:
+        description=f"An error happened with the ticks data upload on our end. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+        await ctx.send(embed=utils.error_embed(description))
+        return False
+    
+    return True
+#Sanitize ticks info, x if x_or_y is true and y if x_or_y is false
+async def sanitize_ticks_info(ctx, dataset_name:str, x_or_y:bool):
+    ticks_dict = None
+    if x_or_y:
+        ticks_dict = await get_xticks_dictionary(ctx, dataset_name)
+    else:
+        ticks_dict = await get_yticks_dictionary(ctx, dataset_name)
+
+    if ticks_dict is None:
+        return None
+    
+    if ticks_dict == {}:
+        return False
+    else:
+        answer = []
+        answer.append(ticks_dict["ticks"])
+        labels = ticks_dict.get("labels", None)
+        if labels is not None:
+            answer.append(labels)
+
+        return answer

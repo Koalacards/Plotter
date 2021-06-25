@@ -70,3 +70,28 @@ def get_axis_info(user_id:int, ds_name:str):
     else:
         for item in query:
             return item.axis_info
+
+def set_x_ticks(user_id:int, ds_name:str, x_ticks:str):
+    query = DatasetEntries.update(x_ticks=x_ticks).where(DatasetEntries.user_id == user_id and DatasetEntries.ds_name == ds_name)
+    return query.execute()
+
+def get_x_ticks(user_id:int, ds_name:str):
+    query = DatasetEntries.select().where(DatasetEntries.user_id == user_id and DatasetEntries.ds_name == ds_name)
+    if len(query) == 0:
+        raise Exception("query does not exist")
+    else:
+        for item in query:
+            return item.x_ticks
+
+def set_y_ticks(user_id:int, ds_name:str, y_ticks:str):
+    query = DatasetEntries.update(y_ticks=y_ticks).where(DatasetEntries.user_id == user_id and DatasetEntries.ds_name == ds_name)
+    return query.execute()
+
+def get_y_ticks(user_id:int, ds_name:str):
+    query = DatasetEntries.select().where(DatasetEntries.user_id == user_id and DatasetEntries.ds_name == ds_name)
+    if len(query) == 0:
+        raise Exception("query does not exist")
+    else:
+        for item in query:
+            return item.y_ticks
+

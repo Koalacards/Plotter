@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
-from numpy.lib.npyio import save
 import utils
 import plotvars
 from plotvars import guild_ids
@@ -62,28 +61,17 @@ class SavedPlotGeneration(commands.Cog):
             first_set_common_plot_info = True
             new_figure_created = True
 
-        print(f"Generating: {first_plot_name} {first_plot_type}")
-
         await self._plotgenerate(ctx, dataset_name, first_plot_name,
          False, first_create_figure, first_set_common_plot_info, False,
           new_figure_created, False)
 
-        print(f"{first_plot_name} {first_plot_type} : Generated")
-
-        print(f"Generating: {second_plot_name} {second_plot_type}")
-
         await self._plotgenerate(ctx, dataset_name, second_plot_name,
          False, False, False, False,
           True, False)
-
-        print(f"{second_plot_name} {second_plot_type}: Generated")
-
         
         #Once we have finish combining, print out the plot
         if first_combine == False:
             return
-
-        print("Getting ready to send the plot")
         
         file_name = f'plot_{dataset_name}.png'
 

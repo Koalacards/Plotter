@@ -71,7 +71,7 @@ class Scatterplot(commands.Cog):
                 plothelpers.create_figure()
         
         if set_common_plot_info:
-                plothelpers.set_common_plot_info(ctx.author, dataset_name, x_label, y_label)
+            await plothelpers.set_common_plot_info(ctx, dataset_name, x_label, y_label)
         
         create_plot(x, y, size, color, alpha)
 
