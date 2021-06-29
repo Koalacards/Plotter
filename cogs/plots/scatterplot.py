@@ -112,11 +112,11 @@ async def _sanitize_scatterplot_inputs(ctx, dataset_name:str, x_row:str, y_row:s
         return None
 
     # Check if the x, y and size rows exist in the dataset and are number lists
-    rows_to_check = [x_row, y_row]
+    labels = [x_row, y_row]
     if size_row != "":
-        rows_to_check.append(size_row)
+        labels.append(size_row)
     
-    row_values = await asyncutils.verify_rows_are_rows_of_numbers(ctx, dataset_name, datadict, rows_to_check)
+    row_values = await asyncutils.verify_rows_are_rows_of_numbers(ctx, dataset_name, datadict, labels)
     if row_values is None:
         return None
 
@@ -145,18 +145,17 @@ async def _sanitize_scatterplot_inputs(ctx, dataset_name:str, x_row:str, y_row:s
     if color_is_row:
         try:
             utils.verify_list_is_colorlist(color_values)
+            row_values.append(color_values)
+            labels.append(color_row_or_one_color)
         except:
             description=f"The row you entered for colors was not a full list of hexcode colors. Please double-check the colors using `/viewdata {dataset_name}` and try again."
             await ctx.send(embed=utils.error_embed(description))
             return None
     
     #Check that the sizes of all rows are the same
-    size_length = len(size_values) if size_values != "" else len(x_values)
-    color_length = len(color_values) if color_is_row else len(x_values)
-    if len(x_values) != len(y_values) or len(x_values) != size_length or len(x_values) != color_length:
-        description=f"Your rows of \"x\", \"y\", \"size\" and \"color\" values do not have the same length, which is required for a scatterplot. Please double-check the values using `/viewdata {dataset_name}` and try again."
-        await ctx.send(embed=utils.error_embed(description))
-        return None
+    same_length = await asyncutils.verify_same_length(ctx, row_values, labels)
+    if same_length == None:
+        return
 
     #Check that transparency is a float and between 0 and 1
     try:

@@ -146,7 +146,7 @@ class SavedPlotGeneration(commands.Cog):
           set_common_plot_info=set_common_plot_info, send_message=send_message)
 
     async def _generatebar(self, ctx, dataset_name:str, saved_plot_dict, save_and_close:bool, create_figure:bool, set_common_plot_info:bool, send_message:bool):
-        keys = ["x_row", "height_row", "x_label", "y_label", "width", "bottom_coords_row", "align", "color_row_or_one_color"]
+        keys = ["x_row", "height_row", "x_label", "y_label", "width", "bottom_coords_row", "align", "color_row_or_one_color", "label"]
         values_exist = utils.check_values_exist_for_keys(saved_plot_dict, keys)
 
         if values_exist == False:
@@ -162,10 +162,11 @@ class SavedPlotGeneration(commands.Cog):
         bottom_coords_row = saved_plot_dict["bottom_coords_row"]
         align = saved_plot_dict["align"]
         color_row_or_one_color = saved_plot_dict["color_row_or_one_color"]
+        label = saved_plot_dict["label"]
 
         bargraph = BarGraph()
         await bargraph._bargraph(ctx, dataset_name, x_row, height_row, x_label,
-         y_label, width, bottom_coords_row, align, color_row_or_one_color,
+         y_label, width, bottom_coords_row, align, color_row_or_one_color, label,
          save_and_close=save_and_close, create_figure=create_figure,
           set_common_plot_info=set_common_plot_info, send_message=send_message)
 
@@ -186,9 +187,6 @@ class SavedPlotGeneration(commands.Cog):
           figure_created=figure_created,
             first_combine=first_combine)
 
-            
-        
-    
 
 
 def setup(bot):

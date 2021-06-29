@@ -13,11 +13,11 @@ import cogs.plots.plothelpers as plothelpers
 class BarGraph(commands.Cog):
 
     @cog_ext.cog_slash(name='bargraph', guild_ids=guild_ids, description="Generates a bar graph!")
-    async def bargraph(self, ctx, dataset_name:str, x_row:str, height_row:str, x_label:str="", y_label:str="", width:float=0.8, bottom_coords_row:str="", align:str="center", color_row_or_one_color:str="", saveas:str=""):
+    async def bargraph(self, ctx, dataset_name:str, x_row:str, height_row:str, x_label:str="", y_label:str="", width:float=0.8, bottom_coords_row:str="", align:str="center", color_row_or_one_color:str="", label:str="", saveas:str=""):
         #Calls the _bargraph method
-        await self._bargraph(ctx, dataset_name, x_row, height_row, x_label, y_label, width, bottom_coords_row, align, color_row_or_one_color, saveas)
+        await self._bargraph(ctx, dataset_name, x_row, height_row, x_label, y_label, width, bottom_coords_row, align, color_row_or_one_color, label, saveas)
 
-    async def _bargraph(self, ctx, dataset_name:str, x_row:str, height_row:str, x_label:str="", y_label:str="", width:float=0.8, bottom_coords_row:str="", align:str="center", color_row_or_one_color:str="", saveas:str="",
+    async def _bargraph(self, ctx, dataset_name:str, x_row:str, height_row:str, x_label:str="", y_label:str="", width:float=0.8, bottom_coords_row:str="", align:str="center", color_row_or_one_color:str="", label:str="", saveas:str="",
         save_and_close:bool=True, create_figure:bool=True, set_common_plot_info:bool=True, send_message:bool=True):
         """Generates a Bar Graph with the given arguments.
             This method also sanitizes all necessary outputs so that the matplotlib does not fail.
@@ -71,10 +71,10 @@ class BarGraph(commands.Cog):
         if create_figure:
             plothelpers.create_figure()
 
+        create_bar_graph(x, height, bottom, width_sanitized, align_sanitized, color, label)
+
         if set_common_plot_info:
             await plothelpers.set_common_plot_info(ctx, dataset_name, x_label, y_label)
-
-        create_bar_graph(x, height, bottom, width_sanitized, align_sanitized, color)
 
         file_name = f'plot_{dataset_name}.png'
 
@@ -99,7 +99,8 @@ class BarGraph(commands.Cog):
                 "width": width,
                 "bottom_coords_row": bottom_coords_row,
                 "align": align,
-                "color_row_or_one_color": color_row_or_one_color
+                "color_row_or_one_color": color_row_or_one_color,
+                "label": label
             }
 
             await asyncutils.save_graph_data(ctx, dataset_name, saveas, graph_data)
@@ -113,11 +114,12 @@ async def _sanitize_bargraph_inputs(ctx, dataset_name:str, x_row:str, height_row
         return None
 
     #Check if the x_row, height_row and bottom_coords_row (if exists) are number lists
-    rows_to_check = [x_row, height_row]
+    labels = [x_row, height_row]
+    
     if bottom_coords_row != "":
-        rows_to_check.append(bottom_coords_row)
+        labels.append(bottom_coords_row)
 
-    row_values = await asyncutils.verify_rows_are_rows_of_numbers(ctx, dataset_name, datadict, rows_to_check)
+    row_values = await asyncutils.verify_rows_are_rows_of_numbers(ctx, dataset_name, datadict, labels)
     if row_values is None:
         return None
 
@@ -146,18 +148,18 @@ async def _sanitize_bargraph_inputs(ctx, dataset_name:str, x_row:str, height_row
     if color_is_row:
         try:
             utils.verify_list_is_colorlist(color_values)
+            row_values.append(color_values)
+            labels.append(color_row_or_one_color)
         except:
             description=f"The row you entered for colors was not a full list of hexcode colors. Please double-check the colors using `/viewdata {dataset_name}` and try again."
             await ctx.send(embed=utils.error_embed(description))
             return None
     
     #Check that the sizes of all rows are the same
-    bottom_length = len(bottom_values) if bottom_values != "" else len(x_values)
-    color_length = len(color_values) if color_is_row else len(x_values)
-    if len(x_values) != len(height_values) or len(x_values) != bottom_length or len(x_values) != color_length:
-        description=f"Your rows of \"x\", \"height\", \"bottom\" and \"color\" values do not have the same length, which is required for a bar graph. Please double-check the values using `/viewdata {dataset_name}` and try again."
-        await ctx.send(embed=utils.error_embed(description))
-        return None
+    same_length = await asyncutils.verify_same_length(ctx, row_values, labels)
+    if same_length is None:
+        return
+
 
     #Check that width is a float
     try:
@@ -192,8 +194,8 @@ async def _sanitize_bargraph_inputs(ctx, dataset_name:str, x_row:str, height_row
     return answer_dict
 
 #Creates the bar graph with the given inputs
-def create_bar_graph(x, height, bottom, width, align, color) -> None:
-    plt.bar(x, height, width=width, bottom=bottom, align=align, color=color)
+def create_bar_graph(x, height, bottom, width, align, color, label) -> None:
+    plt.bar(x, height, width=width, bottom=bottom, align=align, color=color, label=label)
 
 
 def setup(bot):

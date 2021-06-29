@@ -18,6 +18,7 @@ class DatasetEntries(BaseModel):
     user_id = IntegerField(null=True)
     x_ticks = TextField(null=True)
     y_ticks = TextField(null=True)
+    legend = TextField(null=True)
 
     class Meta:
         table_name = 'DatasetEntries'

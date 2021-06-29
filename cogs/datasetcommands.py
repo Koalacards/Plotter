@@ -224,6 +224,10 @@ class DataSetCommands(commands.Cog):
         yticksdict = await asyncutils.get_yticks_dictionary(ctx, dataset_name)
         description+= f"Y Ticks Dictionary: {str(yticksdict)}\n"
 
+        #Gets the legend data
+        legend = dbfunc.get_legend(author.id, dataset_name)
+        description+= f"Legend: {str(legend)}\n"
+
         try:   
             await ctx.send(embed=utils.create_embed(title=title, description=description, color=color))
         except:
@@ -248,6 +252,18 @@ class DataSetCommands(commands.Cog):
             strtowrite+=f"{key}: {value} \n"
         strtowrite+=f"Plot Title: {dbfunc.get_plot_title(author.id, dataset_name)}\n"
         strtowrite+=f"Axis info: {dbfunc.get_axis_info(author.id,dataset_name)}\n"
+
+        #Get the x ticks data
+        xticksdict = await asyncutils.get_xticks_dictionary(ctx, dataset_name)
+        strtowrite+= f"X Ticks Dictionary: {str(xticksdict)}\n"
+
+        #Get the y ticks data
+        yticksdict = await asyncutils.get_yticks_dictionary(ctx, dataset_name)
+        strtowrite+= f"Y Ticks Dictionary: {str(yticksdict)}\n"
+
+        #Gets the legend data
+        legend = dbfunc.get_legend(author.id, dataset_name)
+        strtowrite+= f"Legend: {str(legend)}\n"
 
         txtfile = f"{author.name}_{dataset_name}.txt"
 

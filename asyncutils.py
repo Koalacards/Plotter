@@ -235,3 +235,21 @@ async def sanitize_ticks_info(ctx, dataset_name:str, x_or_y:bool):
             answer.append(labels)
 
         return answer
+
+#Check if rows of values have the same length
+async def verify_same_length(ctx, values, labels):
+    labels_string = ", ".join(labels)
+    if values == []: 
+        description=f"An error happened on our end: Values list is empty. Please use `/report` to report the issue or get help in our support server: {plotvars.support_discord_link}"
+        await ctx.send(embed=utils.error_embed(description))
+        return None
+    
+    first_length = len(values[0])
+
+    for value in values:
+        if len(value) != first_length:
+            description=f"The following rows must have the same number of values: {labels_string}. Please change your input and try again."
+            await ctx.send(embed=utils.error_embed(description))
+            return None
+    
+    return True

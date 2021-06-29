@@ -36,8 +36,11 @@ async def set_common_plot_info(ctx, dataset_name:str, x_label:str, y_label:str):
         except:
             pass
         plt.yticks(y_ticks, y_labels)
-            
 
+    #legend
+    legend = dbfunc.get_legend(author.id, dataset_name)
+    if legend == "on":
+        plt.legend()
 
 def save_and_close(file_name:str):
     plt.savefig(file_name, dpi='figure')

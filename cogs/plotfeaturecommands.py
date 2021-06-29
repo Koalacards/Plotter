@@ -5,9 +5,10 @@ import db.plotdbfunctions as dbfunc
 import utils
 import asyncutils
 from plotvars import guild_ids
+import cogs.options as options
 
 class PlotFeatureCommands(commands.Cog):
-    @cog_ext.cog_slash(name='setplottitle', guild_ids=guild_ids, description="Set the plot title for your dataset!")
+    @cog_ext.cog_slash(name='setplottitle', guild_ids=guild_ids, description="Set the plot title for your dataset!", options=options.setplottitle_options)
     async def setplottitle(self, ctx, dataset_name:str, plot_title:str):
         """Sets a plot title for your dataset.
 
@@ -45,45 +46,45 @@ class PlotFeatureCommands(commands.Cog):
             description=f"One of your boundary inputs was not a float. Please try again or reference `/help setaxisboundaries` for more information."
             await ctx.send(embed=utils.error_embed(description))
         
-    @cog_ext.cog_slash(name='setaxisoption', guild_ids=guild_ids, description="Set axis mode to a certain option! (Overrides axis boundaries)")
-    async def setaxisoption(self, ctx, dataset_name:str, option:str):
+    @cog_ext.cog_slash(name='setaxisoption', guild_ids=guild_ids, description="Set axis mode to a certain option! (Overrides axis boundaries)", options=options.setaxisoption_options)
+    async def setaxisoption(self, ctx, dataset_name:str, axis_option:str):
         """Sets a specific axis option for a dataset.
 
         Options are based on the axis options that matplotlib has.
 
         Args:
             dataset_name (str): Name of the dataset
-            option (str): Axis option
+            axis_option (str): Axis option
         """
         author = ctx.author
         correct_option=False
-        if option == "on":
-            dbfunc.set_axis_info(author.id, dataset_name, option)
+        if axis_option == "on":
+            dbfunc.set_axis_info(author.id, dataset_name, axis_option)
             correct_option=True
-        elif option == "off":
-            dbfunc.set_axis_info(author.id, dataset_name, option)
+        elif axis_option == "off":
+            dbfunc.set_axis_info(author.id, dataset_name, axis_option)
             correct_option=True
-        elif option == "equal":
-            dbfunc.set_axis_info(author.id, dataset_name, option)
+        elif axis_option == "equal":
+            dbfunc.set_axis_info(author.id, dataset_name, axis_option)
             correct_option=True
-        elif option == "scaled":
-            dbfunc.set_axis_info(author.id, dataset_name, option)
+        elif axis_option == "scaled":
+            dbfunc.set_axis_info(author.id, dataset_name, axis_option)
             correct_option=True
-        elif option == "tight":
-            dbfunc.set_axis_info(author.id, dataset_name, option)
+        elif axis_option == "tight":
+            dbfunc.set_axis_info(author.id, dataset_name, axis_option)
             correct_option=True
-        elif option == "auto":
-            dbfunc.set_axis_info(author.id, dataset_name, option)
+        elif axis_option == "auto":
+            dbfunc.set_axis_info(author.id, dataset_name, axis_option)
             correct_option=True
-        elif option == "image":
-            dbfunc.set_axis_info(author.id, dataset_name, option)
+        elif axis_option == "image":
+            dbfunc.set_axis_info(author.id, dataset_name, axis_option)
             correct_option=True
-        elif option == "square":
-            dbfunc.set_axis_info(author.id, dataset_name, option)
+        elif axis_option == "square":
+            dbfunc.set_axis_info(author.id, dataset_name, axis_option)
             correct_option=True
         
         if correct_option:
-            title=f"Axis option {option} has been set for dataset {dataset_name}!"
+            title=f"Axis option {axis_option} has been set for dataset {dataset_name}!"
             description=""
             colour=discord.Color.green()
             await ctx.send(embed=utils.create_embed(title, description, colour))
@@ -210,6 +211,21 @@ class PlotFeatureCommands(commands.Cog):
         description=""
         color=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, color))
+
+    @cog_ext.cog_slash(name="legend", guild_ids=guild_ids, description="Turns a legend for your plot on or off!", options=options.legend_options)
+    async def legend(self, ctx, dataset_name:str, legend:str):
+        """Sets the legend option for a dataset's plot to on or off.
+
+        Args:
+            dataset_name (str): Name of the dataset
+            legend (str): Either "on" or "off" to turn the legend feature.
+        """
+        author = ctx.author
+        dbfunc.set_legend(author.id, dataset_name, legend)
+        title=f"Successfully set legend setting in dataset {dataset_name} to {legend}!"
+        colour=discord.Color.green()
+        await ctx.send(embed=utils.create_embed(title, "", colour))
+
 
 
 def setup(bot):
