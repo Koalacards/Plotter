@@ -7,10 +7,11 @@ import plotvars
 from plotvars import guild_ids
 import asyncutils
 import os
+import cogs.options as options
 
 class DataSetCommands(commands.Cog):
 
-    @cog_ext.cog_slash(name='createdataset', guild_ids=guild_ids, description="Creates a dataset with a given name!")
+    @cog_ext.cog_slash(name='createdataset', guild_ids=guild_ids, description="Creates a dataset with a given name!", options=options.createdataset_options)
     async def createdataset(self, ctx, name:str):
         """Creates a dataset for the user and adds it to the database.
 
@@ -30,7 +31,7 @@ class DataSetCommands(commands.Cog):
             await ctx.send(embed=utils.error_embed(description))
             return
 
-    @cog_ext.cog_slash(name='removedataset', guild_ids=guild_ids, description="Removes a dataset with a given name")
+    @cog_ext.cog_slash(name='removedataset', guild_ids=guild_ids, description="Removes a dataset with a given name", options=options.removedataset_options)
     async def removedataset(self, ctx, name:str):
         """Removes a user's dataset from the database (if they have one with the given name)
 
@@ -48,7 +49,7 @@ class DataSetCommands(commands.Cog):
             color=discord.Color.green()
             await ctx.send(embed=utils.create_embed(title, description, color))
     
-    @cog_ext.cog_slash(name='addnumberrow', guild_ids=guild_ids, description="Add a row of numbers to your dataset!")
+    @cog_ext.cog_slash(name='addnumberrow', guild_ids=guild_ids, description="Add a row of numbers to your dataset!", options=options.addnumberrow_options)
     async def addnumberrow(self, ctx, dataset_name:str, row_name:str, numbers:str, separator:str=" "):
         """Adds a row of numbers to the data in a user's dataset. The user enters a list of numbers using a
         separator of their choice (default is " "). 
@@ -97,7 +98,7 @@ class DataSetCommands(commands.Cog):
         await ctx.send(embed=utils.create_embed(title, description, color))
 
 
-    @cog_ext.cog_slash(name='addstringrow', guild_ids=guild_ids, description="Add a row of strings to your dataset!")
+    @cog_ext.cog_slash(name='addstringrow', guild_ids=guild_ids, description="Add a row of strings to your dataset!", options=options.addstringrow_options)
     async def addstringrow(self, ctx, dataset_name:str, row_name:str, strings:str, separator:str=" "):
         """Adds a row of strings to the data in a user's dataset. The user enters a list of strings using a
         separator of their choice (default is " "). 
@@ -145,7 +146,7 @@ class DataSetCommands(commands.Cog):
         color=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, color))
 
-    @cog_ext.cog_slash(name='addrandomnumrow', guild_ids=guild_ids, description="Generate a random row of numbers for your dataset!")
+    @cog_ext.cog_slash(name='addrandomnumrow', guild_ids=guild_ids, description="Generate a random row of numbers for your dataset!", options=options.addrandomnumberrow_options)
     async def addrandomnumberrow(self, ctx, dataset_name:str, row_name:str, amount_of_random_numbers:int, minimum_number:float, maximum_number:float):
         """Adds a random row of numbers to a user's dataset, with them choosing the bounds between the numbers and
         amount of numbers.
@@ -194,7 +195,7 @@ class DataSetCommands(commands.Cog):
         color=discord.Color.green()
         await ctx.send(embed=utils.create_embed(title, description, color))
 
-    @cog_ext.cog_slash(name='viewdata', guild_ids=guild_ids, description="View your data from a specific dataset!")
+    @cog_ext.cog_slash(name='viewdata', guild_ids=guild_ids, description="View your data from a specific dataset!", options=options.dataset_name_only_options)
     async def viewdata(self, ctx, dataset_name:str):
         """Gives the user a list of their rows of data in a certain dataset,
          along with their constant graph properties.
@@ -234,7 +235,7 @@ class DataSetCommands(commands.Cog):
             msg = f"Your data was unable to be sent, most likely due to discord's message character limit. Use `/viewdataintxt` to get the data with no character limit."
             await ctx.send(embed=utils.error_embed(msg))
 
-    @cog_ext.cog_slash(name='viewdataintxt', guild_ids=guild_ids, description="Get a txt file with your data from a specific dataset!")
+    @cog_ext.cog_slash(name='viewdataintxt', guild_ids=guild_ids, description="Get a txt file with your data from a specific dataset!", options=options.dataset_name_only_options)
     async def viewdataintxt(self, ctx, dataset_name:str):
         """Gives the user a list of their rows of data in a certain dataset as a .txt file,
          along with their constant graph properties.
@@ -275,7 +276,7 @@ class DataSetCommands(commands.Cog):
 
         os.remove(txtfile)
 
-    @cog_ext.cog_slash(name='viewgraphdata', guild_ids=guild_ids, description="View your saved graphs from a specific dataset!")
+    @cog_ext.cog_slash(name='viewgraphdata', guild_ids=guild_ids, description="View your saved graphs from a specific dataset!", options=options.dataset_name_only_options)
     async def viewgraphdata(self, ctx, dataset_name:str):
         """Gives the user a list of their saved graphs in a certain dataset.
 
@@ -299,7 +300,7 @@ class DataSetCommands(commands.Cog):
             msg = f"Your data was unable to be sent, most likely due to discord's message character limit. Use `/viewdataintxt` to get the data with no character limit."
             await ctx.send(embed=utils.error_embed(msg))
 
-    @cog_ext.cog_slash(name='viewgraphdataintxt', guild_ids=guild_ids, description="Get a txt file with your saved graphs from a specific dataset!")
+    @cog_ext.cog_slash(name='viewgraphdataintxt', guild_ids=guild_ids, description="Get a txt file with your saved graphs from a specific dataset!", options=options.dataset_name_only_options)
     async def viewgraphdataintxt(self, ctx, dataset_name:str):
         """Gives the user a list of their saved graphs in a certain dataset as a txt file
 
@@ -337,7 +338,7 @@ class DataSetCommands(commands.Cog):
         color=discord.Color.orange()
         await ctx.send(embed=utils.create_embed(title=title, description=description, color=color))
 
-    @cog_ext.cog_slash(name='removerow', guild_ids=guild_ids, description="Removes a row of data from your dataset!")
+    @cog_ext.cog_slash(name='removerow', guild_ids=guild_ids, description="Removes a row of data from your dataset!", options=options.removerow_options)
     async def removerow(self, ctx, dataset_name:str, row_name:str):
         """Removes a row of data from a user's dataset.
 
@@ -369,7 +370,7 @@ class DataSetCommands(commands.Cog):
         await ctx.send(embed=utils.create_embed(title, description, color))
 
     
-    @cog_ext.cog_slash(name='addcolorrow', guild_ids=guild_ids, description="Add a row of hex color codes to your dataset!")
+    @cog_ext.cog_slash(name='addcolorrow', guild_ids=guild_ids, description="Add a row of hex color codes to your dataset!", options=options.addcolorrow_options)
     async def addcolorrow(self, ctx, dataset_name:str, row_name:str, colors:str, separator:str=" "):
         """Adds a row of hex color strings to the data in a user's dataset. The user enters a list of colors using a
         separator of their choice (default is " "). 
@@ -417,7 +418,7 @@ class DataSetCommands(commands.Cog):
         await ctx.send(embed=utils.create_embed(title, description, color))
 
 
-    @cog_ext.cog_slash(name='addrandomcolorrow', guild_ids=guild_ids, description="Generates a random row of hex color codes for your dataset!")
+    @cog_ext.cog_slash(name='addrandomcolorrow', guild_ids=guild_ids, description="Generates a random row of hex color codes for your dataset!", options=options.addrandomcolorrow_options)
     async def addrandomcolorrow(self, ctx, dataset_name:str, row_name:str, amount_of_random_colors:int):
         """Adds a random row of hex color strings to a user's dataset,
          with them choosing the amount of colors.
