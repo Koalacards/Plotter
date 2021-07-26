@@ -6,13 +6,14 @@ import utils
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
+import cogs.options as options
 
 class UtilityCommands(commands.Cog):
 
     def __init__(self, bot) -> None:
         self.bot=bot
 
-    @cog_ext.cog_slash(name='report', guild_ids=guild_ids, description="Report a bug directly to Plotter staff!")
+    @cog_ext.cog_slash(name='report', guild_ids=guild_ids, description="Report a bug directly to Plotter staff!", options=options.report_options)
     async def report(self, ctx, report:str):
         report_channel = self.bot.get_channel(plotvars.reports_channel)
         if report_channel is None:
@@ -26,7 +27,7 @@ class UtilityCommands(commands.Cog):
 
             await ctx.send(embed=utils.create_embed("Thank you! Your bug report has been sent.", "", colour))
 
-    @cog_ext.cog_slash(name='suggest', guild_ids=guild_ids, description="Suggest a new idea directly to Plotter staff!")
+    @cog_ext.cog_slash(name='suggest', guild_ids=guild_ids, description="Suggest a new idea directly to Plotter staff!", options=options.suggest_options)
     async def suggest(self, ctx, suggestion:str):
         suggestion_channel = self.bot.get_channel(plotvars.suggestion_channel)
         if suggestion_channel is None:

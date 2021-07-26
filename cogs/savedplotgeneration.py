@@ -10,10 +10,11 @@ from cogs.plots.scatterplot import Scatterplot
 from cogs.plots.bargraph import BarGraph
 import os
 import cogs.plots.plothelpers as plothelpers
+import cogs.options as options
 
 class SavedPlotGeneration(commands.Cog):
 
-    @cog_ext.cog_slash(name='plotgenerate', guild_ids=guild_ids, description="Generates a saved plot from one of yoru datasets!")
+    @cog_ext.cog_slash(name='plotgenerate', guild_ids=guild_ids, description="Generates a saved plot from one of yoru datasets!", options=options.plotgenerate_options)
     async def plotgenerate(self, ctx, dataset_name:str, saved_plot_name:str):
         """Generates a saved plot from a dataset.
 
@@ -27,7 +28,7 @@ class SavedPlotGeneration(commands.Cog):
         await self._plotgenerate(ctx, dataset_name, saved_plot_name)
 
     
-    @cog_ext.cog_slash(name='plotcombine', guild_ids=guild_ids, description="Combines two plots together into one!")
+    @cog_ext.cog_slash(name='plotcombine', guild_ids=guild_ids, description="Combines two plots together into one!", options=options.plotcombine_options)
     async def plotcombine(self, ctx, dataset_name:str, first_plot_name:str, second_plot_name:str, saveas:str=""):
         """Combines two plots into one using plotgenerate!
 
