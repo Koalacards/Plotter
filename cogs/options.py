@@ -11,7 +11,7 @@ datasetcommands.py: 12/12
 helpcommand.py: 0/1
 plotfeaturecommands.py: 3/6
 savedplotgeneration.py: 0/2
-utilitycommands.py: 2/4
+utilitycommands.py: 0/2
 scatterplot.py: 0/1
 bargraph.py: 0/1
 '''
@@ -35,7 +35,7 @@ _row_name_option = manage_commands.create_option(
 
 _separator_option= manage_commands.create_option(
     name="separator",
-    description="String Separator [Default: `' '`] (For example, `1, 2, 3` should have separator `', '`)",
+    description="String Separator [Default: ' '] (For example, '1, 2, 3' should have separator ', ')",
     option_type=3,
     required=True
 )
@@ -94,7 +94,7 @@ addrandomnumberrow_options=[
     manage_commands.create_option(
         name="amount_of_random_numbers",
         description="How many random numbers to add to your row [Must be an integer value]",
-        option_type=2,
+        option_type=4,
         required=True
     ),
     manage_commands.create_option(
@@ -121,7 +121,7 @@ addcolorrow_options=[
     _row_name_option,
     manage_commands.create_option(
         name="colors",
-        description="Colors [hexcode format: `#000FFF`] to add to your row",
+        description="Colors [hexcode format: '#000FFF'] to add to your row",
         option_type=3,
         required=True
     ),
@@ -134,7 +134,7 @@ addrandomcolorrow_options=[
     manage_commands.create_option(
         name="amount_of_random_colors",
         description="How many random colors to add to your row [Must be an integer value]",
-        option_type=2,
+        option_type=4,
         required=True
     )
 ]
