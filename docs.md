@@ -2,6 +2,10 @@
 
 Welcome to Plotter, a bot for making data sets and graphs directly on Discord. The following documentation will list the commands you can use to access Plotter and it's functionalities.
 
+This documentation can be found on Plotter's official github, https://github.com/Koalacards/Plotter/blob/main/docs.md
+
+Plotter can be invited to anyone's Discord server using the following URL: https://discord.com/api/oauth2/authorize?client_id=836212383847809075&permissions=2147535872&scope=bot%20applications.commands
+
 ## How to Read the Documentation
 
 Here is an example command setup:
@@ -28,6 +32,8 @@ This is the default help command, which lists out all of the commands for use in
 - **subset**: _text_ (default: ""): The particular page of commands to see; one of the options: `dataset`, `features`, `generation`, `plots`, `utility`or no string which shows a landing page.
 
 ## Dataset Commands
+
+The following commands are used in order to create datasets and rows of data within the dataset, which will be used to create plots.
 
 /**createdataset** [name]
 
@@ -76,3 +82,138 @@ Adds a set of colors (in hex code format) dataset under a certain row name. If t
 - **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
 - **row_name**: _text_: The name of the row of data, or a pre-existing row to add to
 - **colors**: _text_: The colors (in hex code format) to add as text, with the text being split by the separator given as an optional parameter
+- **separator**: _text_ (default: " "): The separator for the colors text, defaulted to a space
+
+/**addrandomcolorrow** [dataset_name] [row_name] [amount_of_random_colors]
+
+Adds a randomly generated set of colors (in hex-code format) to a dataset under a certain row name. If the row name does not exist, a row will be created with the numbers, and if the row name does exist the numbers will be added to the end of the row.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **row_name**: _text_: The name of the row of data, or a pre-existing row to add to
+- **amount_of_random_colors**: _integer_ : The amount of random numbers that will be generated 
+
+/**removerow** [dataset_name] [row_name]
+
+Removes a row of data from the given dataset, if the row and/or dataset names exist. If not the bot will do nothing
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **row_name**: _text_: The name of the row of data, can be any string (command will not run if the user does not have a row in the dataset with the given name)
+
+## Viewing Datasets Commands
+
+The following commands are used to view the data within a dataset, or to view the datasets a user has.
+
+/**viewdatasets**
+
+View all datasets owned by the user.
+
+/**viewdata** [dataset_name]
+
+Views the rows of data and values within rows for a given dataset. 
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+
+/**viewdataintxt** [dataset_name]
+
+Provides the rows of data and values within rows for a given dataset in a .txt file (this is useful for larger datasets that may not be able to show up on Discord due to Discord's 2000 character message limit).
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+
+/**viewgraphdata** [dataset_name]
+
+Views the saved graphs and properties of the graphs for a dataset. For information on how to save a graph, refer to the `Plot Generation Commands`.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+
+/**viewgraphdataintxt** [dataset_name]
+Provides the saved graphs and properties of the graphs for a given dataset in a .txt file (this is useful for larger datasets that may not be able to show up on Discord due to Discord's 2000 character message limit). For information on how to save a graph, refer to the `Plot Generation Commands`.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+
+## Plot Feature Commands
+
+The following commands are used to set universal features of plots in a dataset, such as the title, axis options, and whether or not to include a legend. These commands should be used before the creation of a plot, unless the user wants the default matplotlib settings.
+
+/**setplottitle** [dataset_name] [plot_title]
+
+Sets the title of any plot created in the dataset. If this command is not called, the default title of each plot is the name of the dataset.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **plot_title**: _text_: The title of the plot, can be any string
+
+/**setaxisboundaries** [dataset_name] [minimum_x] [maximum_x] [minimum_y] [maximum_y]
+
+Sets the ranges for each of the x and y axes.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **minimum_x** _floating point number_: The minimum x value for the axis
+- **maximum_x** _floating point number_: The maximum x value for the axis
+- **minimum_y** _floating point number_: The minimum y value for the axis
+- **maximum_y** _floating point number_: The maximum y value for the axis
+
+/**setaxisoption** [dataset_name] [axis_option]
+
+Sets the axis option setting for each plot in the dataset. This is how axes can be scaled or slightly altered.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **axis_option**: _text_: The axis option: which must be one of the following: `on`, `off`, `equal`, `scaled`, `tight`, `auto`, `image`, or `square`
+
+/**setxticks** [dataset_name] [ticks_row] (labels_row) (remove_ticks)
+
+Sets the ticks for the x-axis of the graph, or the numbers that show ticked along the x axis. Optionally allows the user to add labels under the ticks, or to remove a pre-existing setting of ticks to go back to the matplotlib default.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **ticks_row**: _text_: The name of a row of numbers in the dataset that will become the x ticks for the dataset plots
+- **labels_row**: _text_(default: ""): The name of a row of data (text or numbers) in the dataset that will be the x labels for the dataset plots. This row of data must be the same length as the row of ticks.
+- **remove_ticks**: _text_(default: "off"): Whether or not to remove a pre-existing ticks setting. Must be one of the following: `on`, `off`. If set to `on`, the settings given in the command will not be applied; the only thing that will occur is a reset of previous settings
+
+/**setyticks** [dataset_name] [ticks_row] (labels_row) (remove_ticks)
+
+Sets the ticks for the y-axis of the graph, or the numbers that show ticked along the y axis. Optionally allows the user to add labels under the ticks, or to remove a pre-existing setting of ticks to go back to the matplotlib default.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **ticks_row**: _text_: The name of a row of numbers in the dataset that will become the y ticks for the dataset plots
+- **labels_row**: _text_ (default: ""): The name of a row of data (text or numbers) in the dataset that will be the y labels for the dataset plots. This row of data must be the same length as the row of ticks.
+- **remove_ticks**: _text_(default: "off"): Whether or not to remove a pre-existing ticks setting. Must be one of the following: `on`, `off`. If set to `on`, the settings given in the command will not be applied; the only thing that will occur is a reset of previous settings
+
+/**legend** [dataset_name] [legend]
+
+Turns the legend option either on or off for plots in the dataset. If the legend option is on, then a legend will be created in the plot with labels equal to  the `label` parameter in the plot commands. For more information, please refer to `Plot Commands`.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **legend**: _text_: Whether the legend should be on or off, text must be one of the following options: `on`, `off`
+
+## Plot Commands
+
+The following commands create the different types of graphs using the data in datasets and plot features set using the Plot Feature Commands.
+
+/**scatterplot** [dataset_name] [x_row] [y_row] (x_label) (y_label) (size_row) (color_row_or_one_color) (transparency) (saveas)
+
+Creates a scatterplot with the following properties and dataset data.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **x_row**: _text_: The name of a row of numbers in the dataset corresponding to the x values in the scatterplot. Command will not run if the row does not exist or the row is not a row of numbers
+- **y_row**: _text_: The name of a row of numbers in the dataset corresponding to the y values in the scatterplot. This row must contain the same number of values as the x row. Command will not run if the row does not exist or the row is not a row of numbers
+- **x_label**: _text_(default: ""): The label for the x axis of the plot
+- **y_label**: _text_(default: ""): The label for the y axis of the plot
+- **size_row**: _text_(default: ""): The name of a row of numbers in the dataset corresponding to the size of each scatter in the scatterplot. This row must contain the same number of values as the x and y rows. Command will not run if the row does not exist or the row is not a row of numbers
+- **color_row_or_one_color**(default: ""): _text_: EITHER the name of the row of colors in the dataset corresponding to the size of each scatter OR a single color hex code for all scatters in the plot. If the input is a row, the row must contain the same number of values as the x, y and size rows, and must also exist in the dataset and contain only colors
+- **transparency**(default: 1): _floating point number_: A number between 0 and 1 determining how transparent the scatters are, from 0 being invisible to 1 being fully opaque
+- **save_as**(default: ""): _text_: A name to save the graph as so that it can be generated easily. To generate graphs, view the `Plot Generation Commands`. The graph will then show up in the `viewgraphdata` and `viewgraphdataintxt` commands
+
+/**bargraph** [dataset_name] [x_row] [height_row] (x_label) (y_label) (width) (bottom_coords_row) (align) (color_row_or_one_color) (label) (saveas)
+
+Creates a bar graph with the following properties and dataset data.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **x_row**: _text_: The name of a row of numbers in the dataset corresponding to the x values in the bar graph. Command will not run if the row does not exist or the row is not a row of numbers.
+- **height_row**: _text_: The name of a row of numbers in the dataset corresponding to the height values in the bar graph. This row must contain the same number of values as the x row. Command will not run if the row does not exist or the row is not a row of numbers
+- **x_label**: _text_(default: ""): The label for the x axis of the plot
+- **y_label**: _text_(default: ""): The label for the y axis of the plot
+- **width**: _floating point number_(default: 0.8): The width of all of the bars
+- **bottom_coords_row**: _text_(default: ""): The name of a row of numbers in the dataset corresponding to the initial heights of each bar in the bar graph. This row must contain the same number of values as the x row and heigh row. Command will not run if the row does not exist or the row is not a row of numbers
+- **align**: _text_(default: "center"): The alignment of the bars, must be one of: `center`, `edge`
+- **color_row_or_one_color**(default: ""): _text_: EITHER the name of the row of colors in the dataset corresponding to the size of each bar OR single color hex code for all sbars plot. If the input is a row, the row must contain the same number of values as the x and height rows, and must also exist in the dataset and contain only colors
+- **save_as**(default: ""): _text_: A name to save the graph as so that it can be generated easily. To generate graphs, view the `Plot Generation Commands`. The graph will then show up in the `viewgraphdata` and `viewgraphdataintxt` commands
+
+
