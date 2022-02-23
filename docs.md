@@ -216,4 +216,46 @@ Creates a bar graph with the following properties and dataset data.
 - **color_row_or_one_color**(default: ""): _text_: EITHER the name of the row of colors in the dataset corresponding to the size of each bar OR single color hex code for all sbars plot. If the input is a row, the row must contain the same number of values as the x and height rows, and must also exist in the dataset and contain only colors
 - **save_as**(default: ""): _text_: A name to save the graph as so that it can be generated easily. To generate graphs, view the `Plot Generation Commands`. The graph will then show up in the `viewgraphdata` and `viewgraphdataintxt` commands
 
+## Plot Generation Commands
 
+These commands generate previous plots that were created using the `save_as` parameters in either graph creation or combination.
+
+/**plotgenerate** [dataset_name] [saved_plot_name]
+
+Generates a plot using the given saved_plot_name, which should be the name of a previously saved plot in the dataset. The `viewgraphdata` command can be used to see which graph names have been saved.
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **saved_plot_name**: _text_: The name of the previously saved plot to generate (command will not run if the name of the plot does not exist)
+
+/**plotcombine** [dataset_name] [first_plot_name] [second_plot_name] (saveas)
+
+Combines the two given saved plots into one, where both data plots will show up together. **Note**: The x and y labels for the graph will be from the first plot, NOT the second!
+
+- **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
+- **first_plot_name**: _text_: The name of the first previously saved plot to combine, using this plot's label information for the combined plot (command will not run if the name of the plot does not exist)
+- **second_plot_name**: _text_: The name of the second previously saved plot to generate (command will not run if the name of the plot does not exist)
+- **save_as**(default: ""): _text_: A name to save the combined graph as so that it can be generated easily. The graph will then show up in the `viewgraphdata` and `viewgraphdataintxt` commands
+
+## Utility Commands
+
+These commands have various functions that do not involve creating datasets or plots
+
+/**report** [report]
+
+Allows the user to report the bug directly for the developer(s) to see.
+
+- **report**: _text_: The bug/problem to report
+
+/**suggest** [suggestion]
+
+Allows the user to submit a feature suggestion directly for the developer(s) to see.
+
+- **suggestion**: _text_: The suggestion offered by the user
+
+/**invite**
+
+Provides a URL for users to invite Plotter to their servers.
+
+/**support**
+
+Provides a link to the offical Plotter support server, where they will be able to get more in-depth assistance.
