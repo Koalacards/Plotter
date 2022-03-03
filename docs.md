@@ -6,17 +6,60 @@ This documentation can be found on Plotter's official github, https://github.com
 
 Plotter can be invited to anyone's Discord server using the following URL: https://discord.com/api/oauth2/authorize?client_id=836212383847809075&permissions=2147535872&scope=bot%20applications.commands
 
+## Table of Contents
+ - [How to Read the Documentation](#how-to-read-the-documentation)
+ - [Help Command](#help-command)
+ - [Dataset Commands](#dataset-commands)
+   - [createdataset](#createdataset)
+   - [removedataset](#removedataset)
+   - [addnumberrow](#addnumberrow)
+   - [addrandomnumrow](#addrandomnumrow)
+   - [addstringrow](#addstringrow)
+   - [addcolorrow](#addcolorrow)
+   - [addrandomcolorrow](#addrandomcolorrow)
+   - [removerow](#removerow)
+ - [Viewing Datasets Commands](#viewing-datasets-commands)
+   - [viewdatasets](#viewdatasets)
+   - [viewdata](#viewdata)
+   - [viewdataintxt](#viewdataintxt)
+   - [viewgraphdata](#viewgraphdata)
+   - [viewgraphdataintxt](#viewgraphdataintxt)
+ - [Plot Feature Commands](#plot-feature-commands)
+   - [setplottitle](#setplottitle)
+   - [setaxisboundaries](#setaxisboundaries)
+   - [setaxisoption](#setaxisoption)
+   - [setxticks](#setxticks)
+   - [setyticks](#setyticks)
+   - [legend](#legend)
+ - [Plot Commands](#plot-commands)
+   - [scatterplot](#scatterplot)
+   - [bargraph](#bargraph)
+ - [Plot Generation Commands](#plot-generation-commands)
+   - [plotgenerate](#plotgenerate)
+   - [plotcombine](#plotcombine)
+ - [Utility Commands](#utility-commands)
+   - [report](#report)
+   - [suggest](#suggest)
+   - [invite](#invite)
+   - [support](#support)
+
 ## How to Read the Documentation
 
 Here is an example command setup:
 
-/**test** [param1] (param2)
+#### test
+```/test [param1] (param2)```
 
 Description of the test command
 
 - **param1**: _type_ : the first parameter in test
 
 - **param1**: _type_ : the second parameter in test
+
+Returns: _something about what it returns_
+
+<img width="508" alt="image" src="https://user-images.githubusercontent.com/44925247/156574345-63c42d4e-d0f4-48b4-a6ec-e547dde6740d.png">
+
 
 The command to enter is right after the forward slash (in this case, test), followed by parameters. Parameters in brackets [] are required for the command, and parameters in parenthesis () are optional.
 
@@ -25,7 +68,8 @@ The parameters are then listed, with the type required for the parameter (text, 
 
 ## Help Command
 
-/**help** (subset)
+#### help
+```/help (subset)```
 
 This is the default help command, which lists out all of the commands for use in Discord.
 
@@ -35,19 +79,22 @@ This is the default help command, which lists out all of the commands for use in
 
 The following commands are used in order to create datasets and rows of data within the dataset, which will be used to create plots.
 
-/**createdataset** [name]
+#### createdataset
+```/createdataset [name]```
 
 Creates a dataset under a certain name, which they will then reference when adding data.
 
 - **name**: _text_ : The name of the dataset to create, can be any string.
 
-/**removedataset** [name]
+#### removedataset
+```/removedataset [name]```
 
 Removes a pre-existing dataset the user has under a certain name (if it exists)
 
 - **name**: _text_ : The name of the dataset to create, can be any string.
 
-/**addnumberrow** [dataset_name] [row_name] [numbers] (separator)
+#### addnumberrow
+```/addnumberrow [dataset_name] [row_name] [numbers] (separator)```
 
 Adds a set of numbers to a dataset under a certain row name. If the row name does not exist, a row will be created with those numbers, and if the row name does exist the numbers will be added to the end of the row.
 
@@ -56,7 +103,8 @@ Adds a set of numbers to a dataset under a certain row name. If the row name doe
 - **numbers**: _text_: The numbers to add as text, with the text being split by the separator given as an optional parameter
 - **separator**: _text_ (default: " "): The separator for the numbers text, defaulted to a space
 
-/**addrandomnumrow** [dataset_name] [row_name] [amount_of_random_numbers] [minimum_number] [maximum_number]
+#### addrandomnumrow
+```/addrandomnumrow [dataset_name] [row_name] [amount_of_random_numbers] [minimum_number] [maximum_number]```
 
 Adds a randomly generated set of numbers to a dataset under a certain row name. If the row name does not exist, a row will be created with the numbers, and if the row name does exist the numbers will be added to the end of the row.
 
@@ -66,7 +114,8 @@ Adds a randomly generated set of numbers to a dataset under a certain row name. 
 - **minimum_number**: _floating point number_: The minimum possible number to be generated (inclusive)
 - **maximum_number**: _floating point number_: The maximum possible number to be generated (inclusive)
 
-/**addstringrow** [dataset_name] [row_name] [strings] (separator)
+#### addstringrow
+```/addstringrow [dataset_name] [row_name] [strings] (separator)```
 
 Adds a set of strings to a dataset under a certain row name. If the row name does not exist, a row will be created with those strings, and if the row name does exist the strings will be added to the end of the row.
 
@@ -75,7 +124,8 @@ Adds a set of strings to a dataset under a certain row name. If the row name doe
 - **strings**: _text_: The strings to add as text, with the text being split by the separator given as an optional parameter
 - **separator**: _text_ (default: " "): The separator for the strings text, defaulted to a space
 
-/**addcolorrow** [dataset_name] [row_name] [strings] (separator)
+#### addcolorrow
+```/addcolorrow [dataset_name] [row_name] [strings] (separator)```
 
 Adds a set of colors (in hex code format) dataset under a certain row name. If the row name does not exist, a row will be created with those colors, and if the row name does exist the colors will be added to the end of the row.
 
@@ -84,7 +134,8 @@ Adds a set of colors (in hex code format) dataset under a certain row name. If t
 - **colors**: _text_: The colors (in hex code format) to add as text, with the text being split by the separator given as an optional parameter
 - **separator**: _text_ (default: " "): The separator for the colors text, defaulted to a space
 
-/**addrandomcolorrow** [dataset_name] [row_name] [amount_of_random_colors]
+#### addrandomcolorrow
+```/addrandomcolorrow [dataset_name] [row_name] [amount_of_random_colors]```
 
 Adds a randomly generated set of colors (in hex-code format) to a dataset under a certain row name. If the row name does not exist, a row will be created with the numbers, and if the row name does exist the numbers will be added to the end of the row.
 
@@ -92,7 +143,8 @@ Adds a randomly generated set of colors (in hex-code format) to a dataset under 
 - **row_name**: _text_: The name of the row of data, or a pre-existing row to add to
 - **amount_of_random_colors**: _integer_ : The amount of random numbers that will be generated 
 
-/**removerow** [dataset_name] [row_name]
+#### removerow
+```/removerow [dataset_name] [row_name]```
 
 Removes a row of data from the given dataset, if the row and/or dataset names exist. If not the bot will do nothing
 
@@ -103,29 +155,34 @@ Removes a row of data from the given dataset, if the row and/or dataset names ex
 
 The following commands are used to view the data within a dataset, or to view the datasets a user has.
 
-/**viewdatasets**
+#### viewdatasets
+```/viewdatasets```
 
 View all datasets owned by the user.
 
-/**viewdata** [dataset_name]
+#### viewdata
+```/viewdata [dataset_name]```
 
 Views the rows of data and values within rows for a given dataset. 
 
 - **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
 
-/**viewdataintxt** [dataset_name]
+#### viewdataintxt
+```/viewdataintxt [dataset_name]```
 
 Provides the rows of data and values within rows for a given dataset in a .txt file (this is useful for larger datasets that may not be able to show up on Discord due to Discord's 2000 character message limit).
 
 - **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
 
-/**viewgraphdata** [dataset_name]
+#### viewgraphdata
+```/viewgraphdata [dataset_name]```
 
 Views the saved graphs and properties of the graphs for a dataset. For information on how to save a graph, refer to the `Plot Generation Commands`.
 
 - **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
 
-/**viewgraphdataintxt** [dataset_name]
+#### viewgraphdataintxt
+```/viewgraphdataintxt [dataset_name]```
 Provides the saved graphs and properties of the graphs for a given dataset in a .txt file (this is useful for larger datasets that may not be able to show up on Discord due to Discord's 2000 character message limit). For information on how to save a graph, refer to the `Plot Generation Commands`.
 
 - **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
@@ -134,14 +191,16 @@ Provides the saved graphs and properties of the graphs for a given dataset in a 
 
 The following commands are used to set universal features of plots in a dataset, such as the title, axis options, and whether or not to include a legend. These commands should be used before the creation of a plot, unless the user wants the default matplotlib settings.
 
-/**setplottitle** [dataset_name] [plot_title]
+#### setplottitle
+```/setplottitle [dataset_name] [plot_title]```
 
 Sets the title of any plot created in the dataset. If this command is not called, the default title of each plot is the name of the dataset.
 
 - **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
 - **plot_title**: _text_: The title of the plot, can be any string
 
-/**setaxisboundaries** [dataset_name] [minimum_x] [maximum_x] [minimum_y] [maximum_y]
+#### setaxisboundaries
+```/setaxisboundaries [dataset_name] [minimum_x] [maximum_x] [minimum_y] [maximum_y]```
 
 Sets the ranges for each of the x and y axes.
 
@@ -151,14 +210,16 @@ Sets the ranges for each of the x and y axes.
 - **minimum_y** _floating point number_: The minimum y value for the axis
 - **maximum_y** _floating point number_: The maximum y value for the axis
 
-/**setaxisoption** [dataset_name] [axis_option]
+#### setaxisoption
+```/setaxisoption [dataset_name] [axis_option]```
 
 Sets the axis option setting for each plot in the dataset. This is how axes can be scaled or slightly altered.
 
 - **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
 - **axis_option**: _text_: The axis option: which must be one of the following: `on`, `off`, `equal`, `scaled`, `tight`, `auto`, `image`, or `square`
 
-/**setxticks** [dataset_name] [ticks_row] (labels_row) (remove_ticks)
+#### setxticks
+```/setxticks [dataset_name] [ticks_row] (labels_row) (remove_ticks)```
 
 Sets the ticks for the x-axis of the graph, or the numbers that show ticked along the x axis. Optionally allows the user to add labels under the ticks, or to remove a pre-existing setting of ticks to go back to the matplotlib default.
 
@@ -167,7 +228,8 @@ Sets the ticks for the x-axis of the graph, or the numbers that show ticked alon
 - **labels_row**: _text_(default: ""): The name of a row of data (text or numbers) in the dataset that will be the x labels for the dataset plots. This row of data must be the same length as the row of ticks.
 - **remove_ticks**: _text_(default: "off"): Whether or not to remove a pre-existing ticks setting. Must be one of the following: `on`, `off`. If set to `on`, the settings given in the command will not be applied; the only thing that will occur is a reset of previous settings
 
-/**setyticks** [dataset_name] [ticks_row] (labels_row) (remove_ticks)
+#### setyticks
+```/setyticks [dataset_name] [ticks_row] (labels_row) (remove_ticks)```
 
 Sets the ticks for the y-axis of the graph, or the numbers that show ticked along the y axis. Optionally allows the user to add labels under the ticks, or to remove a pre-existing setting of ticks to go back to the matplotlib default.
 
@@ -176,7 +238,8 @@ Sets the ticks for the y-axis of the graph, or the numbers that show ticked alon
 - **labels_row**: _text_ (default: ""): The name of a row of data (text or numbers) in the dataset that will be the y labels for the dataset plots. This row of data must be the same length as the row of ticks.
 - **remove_ticks**: _text_(default: "off"): Whether or not to remove a pre-existing ticks setting. Must be one of the following: `on`, `off`. If set to `on`, the settings given in the command will not be applied; the only thing that will occur is a reset of previous settings
 
-/**legend** [dataset_name] [legend]
+#### legend
+```/legend [dataset_name] [legend]```
 
 Turns the legend option either on or off for plots in the dataset. If the legend option is on, then a legend will be created in the plot with labels equal to  the `label` parameter in the plot commands. For more information, please refer to `Plot Commands`.
 
@@ -187,7 +250,8 @@ Turns the legend option either on or off for plots in the dataset. If the legend
 
 The following commands create the different types of graphs using the data in datasets and plot features set using the Plot Feature Commands.
 
-/**scatterplot** [dataset_name] [x_row] [y_row] (x_label) (y_label) (size_row) (color_row_or_one_color) (transparency) (saveas)
+#### scatterplot
+```/scatterplot [dataset_name] [x_row] [y_row] (x_label) (y_label) (size_row) (color_row_or_one_color) (transparency) (saveas)```
 
 Creates a scatterplot with the following properties and dataset data.
 
@@ -201,7 +265,8 @@ Creates a scatterplot with the following properties and dataset data.
 - **transparency**(default: 1): _floating point number_: A number between 0 and 1 determining how transparent the scatters are, from 0 being invisible to 1 being fully opaque
 - **save_as**(default: ""): _text_: A name to save the graph as so that it can be generated easily. To generate graphs, view the `Plot Generation Commands`. The graph will then show up in the `viewgraphdata` and `viewgraphdataintxt` commands
 
-/**bargraph** [dataset_name] [x_row] [height_row] (x_label) (y_label) (width) (bottom_coords_row) (align) (color_row_or_one_color) (label) (saveas)
+#### bargraph
+```/bargraph [dataset_name] [x_row] [height_row] (x_label) (y_label) (width) (bottom_coords_row) (align) (color_row_or_one_color) (label) (saveas)```
 
 Creates a bar graph with the following properties and dataset data.
 
@@ -220,14 +285,16 @@ Creates a bar graph with the following properties and dataset data.
 
 These commands generate previous plots that were created using the `save_as` parameters in either graph creation or combination.
 
-/**plotgenerate** [dataset_name] [saved_plot_name]
+#### plotgenerate
+```/plotgenerate [dataset_name] [saved_plot_name]```
 
 Generates a plot using the given saved_plot_name, which should be the name of a previously saved plot in the dataset. The `viewgraphdata` command can be used to see which graph names have been saved.
 
 - **dataset_name**: _text_: The name of the dataset, can be any string (command will not run if user does not have a dataset with the given name)
 - **saved_plot_name**: _text_: The name of the previously saved plot to generate (command will not run if the name of the plot does not exist)
 
-/**plotcombine** [dataset_name] [first_plot_name] [second_plot_name] (saveas)
+#### plotcombine
+```/plotcombine [dataset_name] [first_plot_name] [second_plot_name] (saveas)```
 
 Combines the two given saved plots into one, where both data plots will show up together. **Note**: The x and y labels for the graph will be from the first plot, NOT the second!
 
@@ -240,22 +307,26 @@ Combines the two given saved plots into one, where both data plots will show up 
 
 These commands have various functions that do not involve creating datasets or plots
 
-/**report** [report]
+#### report
+```/report [report]```
 
 Allows the user to report the bug directly for the developer(s) to see.
 
 - **report**: _text_: The bug/problem to report
 
-/**suggest** [suggestion]
+#### suggest
+```/suggest [suggestion]```
 
 Allows the user to submit a feature suggestion directly for the developer(s) to see.
 
 - **suggestion**: _text_: The suggestion offered by the user
 
-/**invite**
+#### invite
+```/invite```
 
 Provides a URL for users to invite Plotter to their servers.
 
-/**support**
+#### support
+```/support```
 
 Provides a link to the offical Plotter support server, where they will be able to get more in-depth assistance.
