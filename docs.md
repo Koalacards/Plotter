@@ -56,8 +56,6 @@ Description of the test command
 
 - **param1**: _type_ : the second parameter in test
 
-Returns: _something about what it returns_
-
 <img width="508" alt="image" src="https://user-images.githubusercontent.com/44925247/156574345-63c42d4e-d0f4-48b4-a6ec-e547dde6740d.png">
 
 
@@ -75,6 +73,8 @@ This is the default help command, which lists out all of the commands for use in
 
 - **subset**: _text_ (default: ""): The particular page of commands to see; one of the options: `dataset`, `features`, `generation`, `plots`, `utility`or no string which shows a landing page.
 
+<img width="665" alt="image" src="https://user-images.githubusercontent.com/44925247/156578303-1b9369fa-8fc3-4ec8-9a45-64a0af153a5e.png">
+
 ## Dataset Commands
 
 The following commands are used in order to create datasets and rows of data within the dataset, which will be used to create plots.
@@ -85,6 +85,8 @@ The following commands are used in order to create datasets and rows of data wit
 Creates a dataset under a certain name, which they will then reference when adding data.
 
 - **name**: _text_ : The name of the dataset to create, can be any string.
+
+
 
 #### removedataset
 ```/removedataset [name]```
