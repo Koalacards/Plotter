@@ -52,9 +52,8 @@ Here is an example command setup:
 
 Description of the test command
 
-- **param1**: _type_ : the first parameter in test
-
-- **param1**: _type_ : the second parameter in test
+- **param1**: _type_ : the first parameter in test 
+- **param2**: _type_ (default: ...): the second parameter in test
 
 <img width="508" alt="image" src="https://user-images.githubusercontent.com/44925247/156574345-63c42d4e-d0f4-48b4-a6ec-e547dde6740d.png">
 
